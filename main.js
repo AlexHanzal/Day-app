@@ -1,25 +1,21 @@
+const { app, BrowserWindow } = require('electron');
 
+let mainWindow;
 
-const { app, BrowserWindow } = require('electron')
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    fullscreen: true, // Launch in full-screen mode
+    webPreferences: {
+      preload: __dirname + '/renderer.js',
+    },
+  });
 
-const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600
-  })
+  mainWindow.loadFile('index.html');
+});
 
-  win.loadFile('index.html')
-}
-
-app.whenReady().then(() => {
-  createWindow(index.html)
-})
-
-
-app.whenReady().then(() => {
-    createWindow()
-  })
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});

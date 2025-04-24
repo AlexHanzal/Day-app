@@ -1,17 +1,17 @@
-
 {
-  "name": "my-electron-app",
+  "name": "day-app",
   "version": "1.0.0",
-  "description": "A day project app",
+  "description": "little project of mine and one of mine friends",
   "license": "ISC",
-  "author": "Alex Hanzal, Štěpán Kádar",
+  "author": "Alex Hanzal,Steve Kadar",
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
-    "test": "da",
     "start": "electron ."
   },
+  "keywords": [],
   "devDependencies": {
-    "electron": "^35.1.2"
-  }
+    "electron": "^35.1.5"
+  },
+  "json.validate.enable": false
 }

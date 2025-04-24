@@ -1,0 +1,252 @@
+:root {
+  --primary-color: #d9d9d9;
+  --secondary-color: #474747;
+  --font-family: Arial, Helvetica, sans-serif;
+  --sidebar-width: 15%;
+  --third-color: #414141;
+  --fifth-color: #ffffff;
+}
+/*{
+  border: red solid 1px;
+}*/
+* {
+  font-family: var(--font-family);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 90%; /* Adjust height to fit below the header */
+  background-color: var(--secondary-color);
+  padding: 20px;
+  position: fixed;
+  top: 10%; /* Start below the header */
+  left: 0;
+  color: var(--primary-color);
+  z-index: 500; /* Ensure it stays below the header */
+}
+
+.sidebar-right {
+  width: var(--sidebar-width);
+  height: 90%; /* Adjust height to fit below the header */
+  background-color: var(--secondary-color);
+  padding: 20px;
+  position: fixed;
+  top: 10%; /* Start below the header */
+  right: 0;
+  color: var(--primary-color);
+  z-index: 500; /* Ensure it stays below the header */
+}
+
+body{
+  background-color: var(--third-color);
+  margin: 0;
+  padding: 0;
+}
+.title{
+  color: var(--primary-color);
+  font-size: 2em;
+  text-align: center;
+  padding: auto;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+}
+header{
+  background-color: var(--secondary-color);
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 1.5em;
+  font-weight: bold;
+  height: 10%;
+  display: flex; /* Use flexbox */
+  align-items: center; /* Vertically center content */
+  justify-content: center; /* Horizontally center content */
+  border-bottom: #d9d9d9 solid 1px;
+  position: fixed; /* Fix the header at the top */
+  top: 0;
+  left: 0;
+  width: 100%; /* Ensure it spans the full width */
+  z-index: 1000; /* Ensure it stays above the sidebars */
+}
+.clock{
+  font-size:  clamp(16px, 2vw, 32px); 
+  color: var(--primary-color);;
+  color: var(--primary-color);
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin: 10px 0;
+}
+.clock-separator {
+  width: 90%; /* Adjust the width as needed */
+  margin: 10px auto; /* Center the separator and add vertical spacing */
+  border: none; /* Remove default border */
+  height: 2px; /* Set the height of the separator */
+  background-color: var(--primary-color); /* Use the primary color for the separator */
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.current-date{
+  font-size: clamp(14.8px, 1.6vw, 29.6px); /* Reduced by 20% */
+  color: var(--fifth-color);
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin: 10px 0;
+  border: #000000 solid 1.5px;
+  background-color: #232323c9;
+  border-radius: 8px; /* Make the border round */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow effect */
+}
+.dates{
+  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
+  color: var(--primary-color);
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin: 10px 0;
+}
+.calendar-title{
+  text-align: center;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Add spacing between the buttons and the title */
+}
+
+.calendar-header .calendar-title {
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.prev-button,
+.next-button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  padding: 5px 10px;
+  font-size: 1.2em; /* Increase font size for boldness */
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold; /* Make the text bolder */
+}
+
+.prev-button:hover,
+.next-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.calendar-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px; /* Add spacing above the buttons */
+}
+
+.calendar-buttons .prev-button,
+.calendar-buttons .next-button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  padding: 5px 10px;
+  font-size: 1.2em; /* Increase font size for boldness */
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold; /* Make the text bolder */
+}
+
+.calendar-buttons .prev-button:hover,
+.calendar-buttons .next-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+td {
+  padding: 0; /* Remove padding from all cells */
+  text-align: center; /* Center align the numbers */
+  border-radius: 5px; /* Add rounded corners to all table cells */
+  width: 14.28%; /* Ensure cells take equal width (100% / 7 days) */
+  height: 40px; /* Set a consistent height for cells */
+  vertical-align: middle; /* Center align text vertically */
+  border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
+}
+.month-dates{
+  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
+  color: #9d9d9d9f;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.pop-up {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  width: 80%; /* Adjust width as needed */
+  max-width: 500px;
+}
+
+.pop-up.active {
+  display: block; /* Show the pop-up when active */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  padding: 5px 10px;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+table {
+  border-collapse: collapse; /* Remove gaps between table cells */
+  width: 100%; /* Make the table take the full width of its container */
+  table-layout: fixed; /* Ensure all columns have equal width */
+}
+
+td, th {
+  padding: 0; /* Remove padding from all cells */
+  text-align: center; /* Center align the text */
+  width: 14.28%; /* Ensure each cell takes up an equal width (100% / 7 days) */
+  height: 40px; /* Set a consistent height for cells */
+  vertical-align: middle; /* Center align text vertically */
+  border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
+}
+
+th {
+  font-weight: bold; /* Make header text bold */
+  color: var(--primary-color); /* Use primary color for header text */
+}
