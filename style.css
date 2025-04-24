@@ -32,18 +32,6 @@ html, body {
   z-index: 500; /* Ensure it stays below the header */
 }
 
-.sidebar-right {
-  width: var(--sidebar-width);
-  height: 90%; /* Adjust height to fit below the header */
-  background-color: var(--secondary-color);
-  padding: 20px;
-  position: fixed;
-  top: 10%; /* Start below the header */
-  right: 0;
-  color: var(--primary-color);
-  z-index: 500; /* Ensure it stays below the header */
-}
-
 body{
   background-color: var(--third-color);
   margin: 0;
@@ -204,8 +192,8 @@ td {
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  width: 80%; /* Adjust width as needed */
-  max-width: 500px;
+  width: 300px; /* Match the width of the select window */
+  height: auto; /* Adjust height dynamically */
 }
 
 .pop-up.active {
@@ -224,11 +212,13 @@ td {
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold;
+  border: 2px solid var(--primary-color); /* Add border */
 }
 
 .close-button:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
+  border-color: var(--secondary-color); /* Change border color on hover */
 }
 
 table {
@@ -249,4 +239,361 @@ td, th {
 th {
   font-weight: bold; /* Make header text bold */
   color: var(--primary-color); /* Use primary color for header text */
+}
+
+#create-new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em; /* Increase size for better visibility */
+  width: 50px;
+  height: 50px;
+  margin: 20px auto 0; /* Add more top margin */
+  border-radius: 50%; /* Make it circular */
+  background-color: transparent; /* Remove background */
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color); /* Add border for the circle */
+  cursor: pointer;
+  font-weight: bold; /* Make text bold */
+}
+
+#create-new:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.select-screen {
+  display: none; /* Ensure the select screen is hidden on startup */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* Match the height of the pop-up */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 1000;
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  pointer-events: auto !important;
+}
+
+.select-screen.active {
+  display: flex; /* Use flexbox for centering */
+}
+
+.select-window {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  width: 300px; /* Set a fixed width */
+  height: auto; /* Adjust height dynamically */
+  text-align: center;
+  position: relative; /* For positioning the close button */
+}
+
+.select-window input,
+.select-window select {
+  pointer-events: auto !important;
+  user-select: text !important;
+  cursor: text !important;
+}
+
+.close-select {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  padding: 5px 10px;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+  border: 2px solid var(--primary-color); /* Add border */
+}
+
+.close-select:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border-color: var(--secondary-color); /* Change border color on hover */
+}
+
+.input-group {
+  margin: 10px 0;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%; /* Ensure both input and select take the full width */
+  padding: 8px;
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  box-sizing: border-box; /* Include padding and border in the element's width */
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.submit-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.submit-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+button:hover {
+  border-color: var(--secondary-color); /* Change border color on hover */
+}
+
+.dynamic-link {
+  display: block;
+  margin: 10px auto; /* Center the link and add spacing */
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center; /* Ensure text is centered */
+}
+
+.dynamic-link:hover {
+  text-decoration: underline;
+}
+
+#dynamic-links-container {
+  text-align: center; /* Center the container for buttons */
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Allow wrapping to a new row */
+  gap: 10px; /* Add spacing between buttons */
+  justify-content: center; /* Center buttons horizontally */
+}
+
+.dynamic-button {
+  display: block;
+  padding: 15px 30px; /* Increase padding for a larger button */
+  font-size: 1.2em; /* Increase font size */
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  max-width: 200px; /* Set maximum width for the button */
+  width: 100%; /* Allow the button to shrink if needed */
+  box-sizing: border-box; /* Include padding and border in the width */
+  word-wrap: break-word; /* Ensure text wraps to a new row */
+  white-space: normal; /* Allow text to break into multiple lines */
+}
+
+.dynamic-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.time-table {
+  display: none; /* Initially hidden */
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 10%; /* Start below the header */
+  left: var(--sidebar-width); /* Start next to the left sidebar */
+  width: calc(100% - var(--sidebar-width)); /* Fill the remaining width */
+  height: 90%; /* Fill the remaining height below the header */
+  overflow-y: auto; /* Add scrolling if content overflows */
+  text-align: center;
+}
+
+.week-table {
+  border-collapse: collapse;
+  width: 95%; /* Adjust table width to fit nicely */
+  margin: 0 auto; /* Center the table within the time-table container */
+  background-color: var(--secondary-color);
+}
+
+.week-table th, .week-table td {
+  border: 1px solid var(--primary-color);
+  padding: 8px;
+  text-align: center;
+  color: var(--primary-color);
+  min-width: 80px;
+  height: 30px;
+}
+
+.week-table th {
+  background-color: var(--secondary-color);
+  font-weight: bold;
+}
+
+.week-table td:first-child {
+  font-weight: bold;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  text-align: left; /* Align text to the left for better readability */
+  padding-left: 10px; /* Add padding for spacing */
+}
+
+.week-table td[contenteditable="true"] {
+  outline: 2px dashed var(--primary-color); /* Highlight editable cells */
+  cursor: text;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+
+.week-table td.editable {
+  outline: 2px dashed var(--primary-color); /* Highlight editable cells */
+  cursor: text;
+  background-color: #555; /* Darker background for editable cells */
+  color: var(--primary-color); /* Ensure text is visible */
+}
+
+.week-table td.selected {
+  background-color: #666;
+  outline: 2px solid var(--primary-color);
+}
+
+.week-table td[contenteditable="true"]:focus {
+  outline: 2px solid var(--primary-color);
+  background-color: #666;
+}
+
+.week-table td[contenteditable="true"] {
+  cursor: text;
+  outline: 1px solid var(--primary-color);
+}
+
+.week-table td[contenteditable="true"]:focus {
+  background-color: #666 !important;
+  outline: 2px solid var(--primary-color);
+}
+
+.time-table-buttons {
+  margin-top: 20px; /* Add spacing above the buttons */
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  gap: 15px; /* Add spacing between the buttons */
+}
+
+.edit-button,
+.operator-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: var(--primary-color);
+  color: var (--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+.edit-button:hover,
+.operator-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.save-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+.save-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.verification-window {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 2000; /* Above other elements */
+  justify-content: center;
+  align-items: center;
+}
+
+.verification-content {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 90%; /* Adjust width to fit smaller screens */
+  max-width: 300px; /* Set a maximum width */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word; /* Ensure text wraps within the container */
+}
+
+.verification-content input {
+  width: 100%; /* Ensure the input field fits within the container */
+  padding: 10px;
+  margin: 10px 0;
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  background-color: var(--third-color);
+  color: var(--primary-color);
+  box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.verification-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.verification-buttons button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.verification-buttons button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
