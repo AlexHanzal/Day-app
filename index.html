@@ -1,20 +1,112 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <title>Hello from Electron renderer!</title>
-  </head>
-  <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <h1 class="title">Day App</h1>
+  </header>
+  <aside class="sidebar">
+    <ul>
+      <li id="dynamic-links-container"></li> <!-- Container for dynamic links -->
+      <li><button class="create-new" id="create-new">+</button></li>
+    </ul>
+  </aside>
+  <div class="select-screen" id="select-screen">
+    <div class="select-window">
+      <button class="close-select" id="close-select">X</button>
+      <div class="input-group">
+        <label for="name-input">Name:</label>
+        <input type="text" id="name-input" placeholder="Enter name">
+      </div>
+      <div class="input-group">
+        <label for="type-select">Type:</label>
+        <select id="type-select">
+          <option value="thing">Thing</option>
+          <option value="class">Class</option>
+        </select>
+      </div>
+      <button class="submit-button" id="submit-button">Submit</button>
+    </div>
+  </div>
+  
+  <div class="time-table">
+    <h2>Time Table</h2> <!-- This title will be dynamically updated -->
+    <table class="week-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+          <th>8</th>
+          <th>9</th>
+          <th>10</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Monday</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td>Tuesday</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td>Wednesday</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td>Thursday</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td>Friday</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="time-table-buttons">
+      <button class="edit-button">Edit</button>
+      <button class="operator-button">Operator</button>
+    </div>
+  </div>
+  <div class="pop-up" id="pop-up">
+    <div class="calendar-header">
+      <h2 class="calendar-title" id="calendar-title"></h2>
+    </div>
+    <button class="close-button" id="close-button">X</button>
+    <div class="calendar" id="calendar"></div>
+    <div class="calendar-buttons">
+      <button class="prev-button">&lt;</button>
+      <button class="next-button">&gt;</button>
+    </div>
+  </div>
+  <div class="verification-window" id="verification-window">
+    <div class="verification-content">
+      <h2>Verification</h2>
+      <p>Please enter the code:</p>
+      <input type="password" id="verification-code" placeholder="Enter code">
+      <div class="verification-buttons">
+        <button class="close-verification" id="close-verification">Close</button>
+        <button class="confirm-verification" id="confirm-verification">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
 </html>
