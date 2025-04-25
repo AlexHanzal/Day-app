@@ -5,6 +5,15 @@
   --sidebar-width: 15%;
   --third-color: #414141;
   --fifth-color: #ffffff;
+  --sixth-color: #f30000;
+  
+  /* Font size scale variables */
+  --base-font-size: 16px;
+  --scale-small: 0.8;    /* 12.8px */
+  --scale-normal: 1;     /* 16px */
+  --scale-medium: 1.25;  /* 20px */
+  --scale-large: 1.5;    /* 24px */
+  --scale-xlarge: 2;     /* 32px */
 }
 /*{
   border: red solid 1px;
@@ -63,8 +72,7 @@ header{
   z-index: 1000; /* Ensure it stays above the sidebars */
 }
 .clock{
-  font-size:  clamp(16px, 2vw, 32px); 
-  color: var(--primary-color);;
+  font-size: clamp(var(--base-font-size), 2vw, calc(var(--base-font-size) * var(--scale-xlarge))); 
   color: var(--primary-color);
   font-weight: bold;
   text-align: center;
@@ -84,20 +92,29 @@ ul {
   margin: 0;
 }
 .current-date{
-  font-size: clamp(14.8px, 1.6vw, 29.6px); /* Reduced by 20% */
-  color: var(--fifth-color);
+  font-size: clamp(
+    calc(var(--base-font-size) * var(--scale-xlarge)),
+    1.6vw,
+    calc(var(--base-font-size) * 1.85)
+  );
+  color: var(--sixth-color) !important;
   font-weight: bold;
   text-align: center;
   width: 100%;
   margin: 10px 0;
-  border: #000000 solid 1.5px;
-  background-color: #232323c9;
-  border-radius: 8px; /* Make the border round */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow effect */
+  border: #000000d2 solid 1.5px;
+  background-color: #313131;
+  border-radius: 8px;
+  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); */
 }
+
 .dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
-  color: var(--primary-color);
+  font-size: clamp(
+    calc(var(--base-font-size) * var(--scale-small)),
+    1.6vw,
+    calc(var(--base-font-size) * 1.6)
+  );
+  color: var(--primary-color) !important;
   font-weight: bold;
   text-align: center;
   width: 100%;
@@ -116,7 +133,7 @@ ul {
 
 .calendar-header .calendar-title {
   font-weight: bold;
-  font-size: 1.5em;
+  font-size: calc(var(--base-font-size) * var(--scale-large));
   text-align: center;
 }
 
@@ -126,7 +143,7 @@ ul {
   color: var(--primary-color);
   border: none;
   padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
+  font-size: calc(var(--base-font-size) * var(--scale-medium)); /* Increase font size for boldness */
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold; /* Make the text bolder */
@@ -150,7 +167,7 @@ ul {
   color: var(--primary-color);
   border: none;
   padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
+  font-size: calc(var(--base-font-size) * var(--scale-medium)); /* Increase font size for boldness */
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold; /* Make the text bolder */
@@ -172,7 +189,11 @@ td {
   border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
 }
 .month-dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
+  font-size: clamp(
+    calc(var(--base-font-size) * var(--scale-small)),
+    1.6vw,
+    calc(var(--base-font-size) * 1.6)
+  );
   color: #9d9d9d9f;
   font-weight: bold;
   text-align: center;
@@ -208,7 +229,7 @@ td {
   color: var(--primary-color);
   border: none;
   padding: 5px 10px;
-  font-size: 1em;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold;
@@ -245,7 +266,7 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2em; /* Increase size for better visibility */
+  font-size: calc(var(--base-font-size) * var(--scale-xlarge)); /* Increase size for better visibility */
   width: 50px;
   height: 50px;
   margin: 20px auto 0; /* Add more top margin */
@@ -308,7 +329,7 @@ th {
   color: var(--primary-color);
   border: none;
   padding: 5px 10px;
-  font-size: 1em;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold;
@@ -358,6 +379,7 @@ th {
   border: 2px solid var(--primary-color);
   border-radius: 5px;
   cursor: pointer;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   font-weight: bold;
 }
 
@@ -394,7 +416,7 @@ button:hover {
 .dynamic-button {
   display: block;
   padding: 15px 30px; /* Increase padding for a larger button */
-  font-size: 1.2em; /* Increase font size */
+  font-size: calc(var(--base-font-size) * var(--scale-medium)); /* Increase font size */
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
@@ -507,7 +529,7 @@ button:hover {
 .edit-button,
 .operator-button {
   padding: 10px 20px;
-  font-size: 1em;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   background-color: var(--primary-color);
   color: var (--secondary-color);
   border: 2px solid var(--primary-color);
@@ -525,7 +547,7 @@ button:hover {
 
 .save-button {
   padding: 10px 20px;
-  font-size: 1em;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
@@ -584,7 +606,7 @@ button:hover {
 
 .verification-buttons button {
   padding: 10px 20px;
-  font-size: 1em;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
@@ -594,6 +616,42 @@ button:hover {
 }
 
 .verification-buttons button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.selected-date {
+  background-color: var(--primary-color) !important;
+  color: var(--secondary-color) !important;
+  font-weight: bold;
+}
+
+.calendar-controls {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.confirm-date-button {
+  padding: 10px 20px;
+  font-size: calc(var(--base-font-size) * var(--scale-normal));
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-date-button:hover {
   background-color: var(--secondary-color);
   color: var(--primary-color);
 }

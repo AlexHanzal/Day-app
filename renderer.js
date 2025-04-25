@@ -1,97 +1,4 @@
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-
-function updateCalendar(month, year) {
-  const calendarElement = document.getElementById('calendar');
-  const calendarTitle = document.getElementById('calendar-title');
-
-  // Update the calendar title
-  const monthNames = [
-    'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen',
-    'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'
-  ];
-  calendarTitle.textContent = `${monthNames[month]} ${year}`;
-
-  // Clear the existing calendar
-  calendarElement.innerHTML = '';
-
-  // Generate the new calendar
-  const now = new Date(year, month);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayOfWeek = new Date(year, month, 1).getDay();
-  const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-  const table = document.createElement('table');
-  const tableBody = document.createElement('tbody');
-
-  // Add the weekday headers (starting from Monday)
-  const weekdays = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
-  const headerRow = document.createElement('tr');
-  weekdays.forEach(weekday => {
-    const headerCell = document.createElement('th');
-    headerCell.textContent = weekday;
-    headerRow.appendChild(headerCell);
-  });
-  tableBody.appendChild(headerRow);
-
-  // Adjust the first day of the week to start on Monday
-  const adjustedFirstDayOfWeek = (firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1);
-
-  // Generate the days of the month
-  let row = document.createElement('tr');
-
-  // Add cells for the days from the previous month
-  for (let i = adjustedFirstDayOfWeek; i > 0; i--) {
-    const prevMonthDay = daysInPrevMonth - i + 1;
-    const cell = document.createElement('td');
-    cell.textContent = prevMonthDay;
-    cell.classList.add('prev-month', 'month-dates');
-    row.appendChild(cell);
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const cell = document.createElement('td');
-    cell.textContent = day;
-
-    // Fix the logic for highlighting the current date
-    const today = new Date();
-    if (
-      day === today.getDate() &&
-      month === today.getMonth() &&
-      year === today.getFullYear()
-    ) {
-      cell.classList.add('current-date');
-    } else {
-      cell.classList.add('dates');
-    }
-
-    row.appendChild(cell);
-
-    // Append the row only if it's full
-    if ((adjustedFirstDayOfWeek + day) % 7 === 0) {
-      tableBody.appendChild(row);
-      row = document.createElement('tr');
-    }
-  }
-
-  // Add cells for the days from the next month only if the last row is incomplete
-  if (row.children.length > 0 && row.children.length < 7) {
-    let nextMonthDay = 1;
-    while (row.children.length < 7) {
-      const cell = document.createElement('td');
-      cell.textContent = nextMonthDay++;
-      cell.classList.add('next-month', 'month-dates');
-      row.appendChild(cell);
-    }
-    tableBody.appendChild(row); // Append the last row
-  }
-
-  // Append the table body to the table
-  table.appendChild(tableBody);
-
-  // Append the table to the calendar element
-  calendarElement.appendChild(table);
-}
+const Calendar = require('./modules/calendar.js');
 
 // Function to toggle the pop-up
 function toggleCalendarPopup() {
@@ -99,7 +6,7 @@ function toggleCalendarPopup() {
   popup.classList.toggle('active');
 }
 
-// Function to toggle the select screen
+// Function to toggle thze select screen
 function toggleSelectScreen() {
   const selectScreen = document.getElementById('select-screen');
   selectScreen.classList.toggle('active');
@@ -107,6 +14,10 @@ function toggleSelectScreen() {
 
 // Remove the calendar popup toggle on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
+  const calendar = new Calendar();
+  calendar.init();
+
+  // Initialize select screen
   const selectScreen = document.getElementById('select-screen');
   selectScreen.style.display = 'none'; // Ensure the select screen is hidden on startup
 });
@@ -148,19 +59,77 @@ document.getElementById('submit-button').addEventListener('click', () => {
 document.getElementById('submit-button').addEventListener('click', () => {
   const nameInput = document.getElementById('name-input').value.trim();
   if (nameInput) {
+    // Create class button
     const dynamicLinksContainer = document.getElementById('dynamic-links-container');
     const newButton = document.createElement('button');
     newButton.textContent = nameInput;
     newButton.className = "dynamic-button";
-    newButton.addEventListener('click', () => {
-      const timeTable = document.querySelector('.time-table');
-      const timeTableTitle = timeTable.querySelector('h2');
-      timeTableTitle.textContent = nameInput; // Set the time table title
-      timeTable.style.display = 'block'; // Show the time table
+    
+    // Create and show calendar container immediately
+    const calendarContainer = document.createElement('div');
+    calendarContainer.className = 'class-calendar';
+    calendarContainer.innerHTML = `
+      <div class="calendar-header">
+        <button class="prev-button">←</button>
+        <h2 id="calendar-title-${nameInput}"></h2>
+        <button class="next-button">→</button>
+      </div>
+      <div id="calendar-${nameInput}"></div>
+      <div class="calendar-controls" style="display: none;">
+        <button class="confirm-date-button">Create Timetable</button>
+      </div>
+    `;
+    
+    document.body.appendChild(calendarContainer);
+    
+    // Initialize and show calendar immediately
+    const classCalendar = new Calendar({
+      calendarId: `calendar-${nameInput}`,
+      titleId: `calendar-title-${nameInput}`,
+      onDateSelect: () => {
+        calendarContainer.querySelector('.calendar-controls').style.display = 'block';
+      }
     });
+    
+    // Show this calendar and hide others
+    document.querySelectorAll('.class-calendar').forEach(cal => cal.style.display = 'none');
+    calendarContainer.style.display = 'block';
+    classCalendar.init();
+    
+    // Add click handler for the confirm date button
+    calendarContainer.querySelector('.confirm-date-button').addEventListener('click', () => {
+      const selectedDate = classCalendar.getSelectedDate();
+      if (selectedDate) {
+        const timeTable = document.querySelector('.time-table');
+        const timeTableTitle = timeTable.querySelector('h2');
+        const dateStr = selectedDate.toLocaleDateString('cs-CZ', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        timeTableTitle.textContent = `${nameInput} - ${dateStr}`;
+        
+        // Hide calendar and show timetable
+        calendarContainer.style.display = 'none';
+        timeTable.style.display = 'block';
+      }
+    });
+    
+    // Add click handler for the class button
+    newButton.addEventListener('click', () => {
+      // Hide all calendars and timetables
+      document.querySelectorAll('.class-calendar').forEach(cal => cal.style.display = 'none');
+      document.querySelector('.time-table').style.display = 'none';
+      
+      // Show this class's calendar and initialize it
+      calendarContainer.style.display = 'block';
+      classCalendar.init();
+    });
+    
     dynamicLinksContainer.appendChild(newButton);
 
-    // Clear the input and hide the select screen
+    // Clear input and hide select screen
     document.getElementById('name-input').value = '';
     document.getElementById('select-screen').style.display = 'none';
   }
@@ -185,9 +154,6 @@ document.querySelector('.next-button').addEventListener('click', () => {
   updateCalendar(currentMonth, currentYear);
 });
 
-// Initialize the calendar only when needed
-updateCalendar(currentMonth, currentYear);
-
 document.getElementById('create-new').addEventListener('click', () => {
   const selectScreen = document.getElementById('select-screen');
   selectScreen.style.display = 'flex'; // Show the select screen
@@ -196,27 +162,6 @@ document.getElementById('create-new').addEventListener('click', () => {
 document.getElementById('close-select').addEventListener('click', () => {
   const selectScreen = document.getElementById('select-screen');
   selectScreen.style.display = 'none'; // Hide the select screen
-});
-
-document.getElementById('submit-button').addEventListener('click', () => {
-  const nameInput = document.getElementById('name-input').value.trim();
-  if (nameInput) {
-    const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = document.createElement('button');
-    newButton.textContent = nameInput;
-    newButton.className = "dynamic-button";
-    newButton.addEventListener('click', () => {
-      const timeTable = document.querySelector('.time-table');
-      if (timeTable) {
-        timeTable.style.display = 'block'; // Show the time table div
-      }
-    });
-    dynamicLinksContainer.appendChild(newButton);
-
-    // Clear the input and hide the select screen
-    document.getElementById('name-input').value = '';
-    document.getElementById('select-screen').style.display = 'none';
-  }
 });
 
 document.querySelector('.operator-button').addEventListener('click', () => {
@@ -232,34 +177,33 @@ document.getElementById('close-verification').addEventListener('click', () => {
 document.getElementById('confirm-verification').addEventListener('click', () => {
   const codeInput = document.getElementById('verification-code').value.trim();
   if (codeInput === '1918') {
-    alert('Access granted!');
     const verificationWindow = document.getElementById('verification-window');
     verificationWindow.style.display = 'none';
 
-    // Simple table editing
     const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
     tableCells.forEach(cell => {
       cell.contentEditable = 'true';
       cell.style.backgroundColor = '#555';
     });
 
-    // Add save button
+    // Add save button if it doesn't exist
     const timeTableButtons = document.querySelector('.time-table-buttons');
     if (!document.querySelector('.save-button')) {
       const saveButton = document.createElement('button');
       saveButton.textContent = 'Save';
       saveButton.className = 'save-button';
-      saveButton.addEventListener('click', () => {
-        tableCells.forEach(cell => {
-          cell.contentEditable = 'false';
-          cell.style.backgroundColor = '';
-        });
-        alert('Changes saved!');
-      });
+      saveButton.addEventListener('click', handleSave);
       timeTableButtons.appendChild(saveButton);
     }
   } else {
     alert('Invalid code. Please try again.');
+  }
+});
+
+// Update operator verification to support Return key
+document.getElementById('verification-code').addEventListener('keyup', (event) => {
+  if (event.key === 'Enter') {
+    document.getElementById('confirm-verification').click();
   }
 });
 
