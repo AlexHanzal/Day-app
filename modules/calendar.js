@@ -11,15 +11,27 @@ class Calendar {
         this.weekdays = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
         this.selectedDate = null;
         this.onDateSelect = config.onDateSelect || null;
+        this.selectedDateDisplay = null;
     }
 
     updateCalendar() {
         const calendarElement = document.getElementById(this.calendarId);
         const calendarTitle = document.getElementById(this.titleId);
-
+        
+        // Update title with just month and year
         calendarTitle.textContent = `${this.monthNames[this.currentMonth]} ${this.currentYear}`;
-        calendarElement.innerHTML = '';
+        
+        // Update selected date display if exists
+        if (this.selectedDateDisplay && this.selectedDate) {
+            this.selectedDateDisplay.textContent = this.selectedDate.toLocaleDateString('cs-CZ', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
 
+        calendarElement.innerHTML = '';
         const table = this._createCalendarTable();
         calendarElement.appendChild(table);
     }
@@ -103,9 +115,8 @@ class Calendar {
         const allCells = document.querySelectorAll(`#${this.calendarId} td`);
         allCells.forEach(cell => cell.classList.remove('selected-date'));
         
-        // Add selection to clicked date
+        // Add selection to clicked date and store the full date
         event.target.classList.add('selected-date');
-        
         this.selectedDate = new Date(this.currentYear, this.currentMonth, day);
         
         if (this.onDateSelect) {
@@ -145,9 +156,18 @@ class Calendar {
     init() {
         this.updateCalendar();
         
-        // Add event listeners for navigation buttons
-        document.querySelector('.prev-button').addEventListener('click', () => this.prevMonth());
-        document.querySelector('.next-button').addEventListener('click', () => this.nextMonth());
+        // Create selected date display element
+        this.selectedDateDisplay = document.createElement('div');
+        this.selectedDateDisplay.className = 'selected-date-display';
+        document.getElementById(this.calendarId).parentNode.insertBefore(
+            this.selectedDateDisplay,
+            document.getElementById(this.calendarId)
+        );
+        
+        // Update navigation buttons for month navigation only
+        const container = document.getElementById(this.calendarId).closest('.class-calendar');
+        container.querySelector('.prev-button').addEventListener('click', () => this.prevMonth());
+        container.querySelector('.next-button').addEventListener('click', () => this.nextMonth());
     }
 }
 

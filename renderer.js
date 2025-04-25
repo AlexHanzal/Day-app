@@ -6,6 +6,18 @@ function toggleCalendarPopup() {
   popup.classList.toggle('active');
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize select screen to be hidden
+  const selectScreen = document.getElementById('select-screen');
+  selectScreen.style.display = 'none';
+  
+  // Remove duplicate event listeners and init calendar
+  document.getElementById('create-new').addEventListener('click', () => {
+    selectScreen.style.display = 'flex';
+    document.getElementById('name-input').focus();
+  });
+});
+
 // Function to toggle thze select screen
 function toggleSelectScreen() {
   const selectScreen = document.getElementById('select-screen');
@@ -68,15 +80,18 @@ document.getElementById('submit-button').addEventListener('click', () => {
     // Create and show calendar container immediately
     const calendarContainer = document.createElement('div');
     calendarContainer.className = 'class-calendar';
+    calendarContainer.style.display = 'none';
     calendarContainer.innerHTML = `
-      <div class="calendar-header">
-        <button class="prev-button">←</button>
-        <h2 id="calendar-title-${nameInput}"></h2>
-        <button class="next-button">→</button>
-      </div>
-      <div id="calendar-${nameInput}"></div>
-      <div class="calendar-controls" style="display: none;">
-        <button class="confirm-date-button">Create Timetable</button>
+      <div class="calendar-wrapper">
+        <div class="calendar-header">
+          <button class="prev-button">←</button>
+          <h2 id="calendar-title-${nameInput}"></h2>
+          <button class="next-button">→</button>
+        </div>
+        <div id="calendar-${nameInput}"></div>
+        <div class="calendar-controls" style="display: none;">
+          <button class="confirm-date-button">Create Timetable</button>
+        </div>
       </div>
     `;
     
@@ -154,11 +169,6 @@ document.querySelector('.next-button').addEventListener('click', () => {
   updateCalendar(currentMonth, currentYear);
 });
 
-document.getElementById('create-new').addEventListener('click', () => {
-  const selectScreen = document.getElementById('select-screen');
-  selectScreen.style.display = 'flex'; // Show the select screen
-});
-
 document.getElementById('close-select').addEventListener('click', () => {
   const selectScreen = document.getElementById('select-screen');
   selectScreen.style.display = 'none'; // Hide the select screen
@@ -219,13 +229,5 @@ function handleSave() {
     cell.contentEditable = 'false';
     cell.style.backgroundColor = '';
   });
-  alert('Changes saved!');
 }
-
-// Ensure the "create-new" button remains functional
-document.getElementById('create-new').addEventListener('click', () => {
-  const selectScreen = document.getElementById('select-screen');
-  selectScreen.style.display = 'flex'; // Show the select screen
-  document.getElementById('name-input').focus(); // Focus on the input field
-});
 
