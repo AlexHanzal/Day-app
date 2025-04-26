@@ -8,7 +8,11 @@
 </head>
 <body>
   <header class="header" id="header">
-    <h1 class="title">Day App</h1>
+    <h1 class="title">Zaber si</h1>
+    <div class="window-controls">
+      <button id="fullscreen-toggle">□</button>
+      <button id="close-app">✕</button>
+    </div>
   </header>
   <aside class="sidebar">
     <ul>
@@ -35,54 +39,70 @@
   </div>
   
   <div class="time-table">
-    <h2>Time Table</h2> <!-- This title will be dynamically updated -->
-    <table class="week-table">
-      <thead>
-        <tr>
-          <th>Day</th>
-          <th>1</th>
-          <th>2</th>
-          <th>3</th>
-          <th>4</th>
-          <th>5</th>
-          <th>6</th>
-          <th>7</th>
-          <th>8</th>
-          <th>9</th>
-          <th>10</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Monday</td>
-          <td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td>Tuesday</td>
-          <td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td>Wednesday</td>
-          <td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td>Thursday</td>
-          <td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td>Friday</td>
-          <td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td><td></td><td></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="time-table-buttons">
-      <button class="edit-button">Edit</button>
-      <button class="operator-button">Operator</button>
+    <h2>Time Table</h2>
+    <div class="timetable-content">
+      <div class="table-container">
+        <table class="week-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
+              <th>7</th>
+              <th>8</th>
+              <th>9</th>
+              <th>10</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pondělí</td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+              <td>Úterý</td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+              <td>Středa</td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+              <td>Čtvrtek</td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+              <td>Pátek</td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bottom-content">
+        <div class="time-table-buttons">
+          <button class="edit-button">Edit</button>
+          <button class="operator-button">Operator</button>
+          <button class="save-button">Save</button>
+          
+        </div>
+        <div class="timetable-calendar">
+          <div class="calendar-header">
+            <button class="prev-button">&lt;</button>
+            <h3 class="calendar-title" id="timetable-calendar-title"></h3>
+            <button class="next-button">&gt;</button>
+          </div>
+          <div class="calendar" id="timetable-calendar"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="pop-up" id="pop-up">

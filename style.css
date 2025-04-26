@@ -2,18 +2,10 @@
   --primary-color: #d9d9d9;
   --secondary-color: #474747;
   --font-family: Arial, Helvetica, sans-serif;
-  --sidebar-width: 15%;
+  --sidebar-width: 12%; /* Reduced from 15% */
   --third-color: #414141;
   --fifth-color: #ffffff;
-  --sixth-color: #f30000;
-  
-  /* Font size scale variables */
-  --base-font-size: 16px;
-  --scale-small: 0.8;    /* 12.8px */
-  --scale-normal: 1;     /* 16px */
-  --scale-medium: 1.25;  /* 20px */
-  --scale-large: 1.5;    /* 24px */
-  --scale-xlarge: 2;     /* 32px */
+  --header-height: 10%;
 }
 /*{
   border: red solid 1px;
@@ -32,13 +24,26 @@ html, body {
 .sidebar {
   width: var(--sidebar-width);
   height: 90%; /* Adjust height to fit below the header */
-  background-color: var(--secondary-color);
-  padding: 20px;
+  background-color: #333333; /* Darker color instead of var(--secondary-color) */
+  padding: 15px; /* Reduced from 20px */
   position: fixed;
   top: 10%; /* Start below the header */
   left: 0;
   color: var(--primary-color);
   z-index: 500; /* Ensure it stays below the header */
+  border-right: var(--fifth-color) solid 1px; /* Change from full border to right-only */
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 body{
@@ -55,7 +60,7 @@ body{
   text-shadow: 2px 2px 4px #000000;
 }
 header{
-  background-color: var(--secondary-color);
+  background-color: #3d3d3d;
   text-align: center;
   color: var(--primary-color);
   font-size: 1.5em;
@@ -72,7 +77,8 @@ header{
   z-index: 1000; /* Ensure it stays above the sidebars */
 }
 .clock{
-  font-size: clamp(var(--base-font-size), 2vw, calc(var(--base-font-size) * var(--scale-xlarge))); 
+  font-size:  clamp(16px, 2vw, 32px); 
+  color: var(--primary-color);;
   color: var(--primary-color);
   font-weight: bold;
   text-align: center;
@@ -92,29 +98,19 @@ ul {
   margin: 0;
 }
 .current-date{
-  font-size: clamp(
-    calc(var(--base-font-size) * var(--scale-xlarge)),
-    1.6vw,
-    calc(var(--base-font-size) * 1.85)
-  );
-  color: var(--sixth-color) !important;
+  font-size: clamp(14.8px, 1.6vw, 29.6px); /* Reduced by 20% */
+  color: var(--fifth-color);
   font-weight: bold;
   text-align: center;
   width: 100%;
   margin: 10px 0;
-  border: #000000d2 solid 1.5px;
-  background-color: #313131;
-  border-radius: 8px;
-  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); */
+  background-color: #232323c9;
+  border-radius: 8px; /* Make the border round */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow effect */
 }
-
 .dates{
-  font-size: clamp(
-    calc(var(--base-font-size) * var(--scale-small)),
-    1.6vw,
-    calc(var(--base-font-size) * 1.6)
-  );
-  color: var(--primary-color) !important;
+  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
+  color: var(--primary-color);
   font-weight: bold;
   text-align: center;
   width: 100%;
@@ -133,45 +129,26 @@ ul {
 
 .calendar-header .calendar-title {
   font-weight: bold;
-  font-size: calc(var(--base-font-size) * var(--scale-large));
+  font-size: 1.5em;
   text-align: center;
 }
 
 .prev-button,
 .next-button {
-  background-color: transparent;
+  background-color: var(--secondary-color);
   color: var(--primary-color);
   border: none;
-  padding: 0;
-  font-size: 36px;
+  padding: 5px 10px;
+  font-size: 1.2em; /* Increase font size for boldness */
   cursor: pointer;
-  min-width: 45px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  line-height: 0;
-  text-align: center;
-  position: relative;
-  top: -6px; /* Increased from -3px to -6px to move buttons higher */
+  border-radius: 5px;
+  font-weight: bold; /* Make the text bolder */
 }
 
-.prev-button span,
-.next-button span {
-  position: relative;
-  transform: scale(1);
-  transition: transform 0.2s ease;
-  line-height: 0;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.prev-button:hover span,
-.next-button:hover span {
-  transform: scale(1.3);
-  text-shadow: 0 0 8px rgba(217, 217, 217, 0.6);
-  color: var(--fifth-color);
+.prev-button:hover,
+.next-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .calendar-buttons {
@@ -184,9 +161,9 @@ ul {
 .calendar-buttons .next-button {
   background-color: var(--secondary-color);
   color: var(--primary-color);
-  border: #000000 solid 1.5px;
+  border: none;
   padding: 5px 10px;
-  font-size: calc(var(--base-font-size) * var(--scale-large)); /* Increase font size for boldness */
+  font-size: 1.2em; /* Increase font size for boldness */
   cursor: pointer;
   border-radius: 5px;
   font-weight: bold; /* Make the text bolder */
@@ -208,59 +185,12 @@ td {
   border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
 }
 .month-dates{
-  font-size: clamp(
-    calc(var(--base-font-size) * var(--scale-small)),
-    1.6vw,
-    calc(var(--base-font-size) * 1.6)
-  );
+  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
   color: #9d9d9d9f;
   font-weight: bold;
   text-align: center;
   width: 100%;
   margin: 10px 0;
-}
-
-.pop-up {
-  display: none; /* Initially hidden */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  width: 300px; /* Match the width of the select window */
-  height: auto; /* Adjust height dynamically */
-}
-
-.pop-up.active {
-  display: block; /* Show the pop-up when active */
-}
-
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: var(--third-color);
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-  padding: 4px 8px;
-  cursor: pointer;
-  border-radius: 3px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.close-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  transform: scale(1.05);
 }
 
 table {
@@ -287,9 +217,9 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: calc(var(--base-font-size) * var(--scale-xlarge)); /* Increase size for better visibility */
-  width: 50px;
-  height: 50px;
+  font-size: 2em; /* Increase size for better visibility */
+  width: 40px; /* Reduced from 50px */
+  height: 40px; /* Reduced from 50px */
   margin: 20px auto 0; /* Add more top margin */
   border-radius: 50%; /* Make it circular */
   background-color: transparent; /* Remove background */
@@ -305,21 +235,20 @@ th {
 }
 
 .select-screen {
-  display: none; /* Only this display property */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  pointer-events: auto !important;
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
 }
 
 .select-screen.active {
   display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .select-window {
@@ -332,6 +261,7 @@ th {
   height: auto; /* Adjust height dynamically */
   text-align: center;
   position: relative; /* For positioning the close button */
+  z-index: 2001;
 }
 
 .select-window input,
@@ -345,23 +275,21 @@ th {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: var(--third-color);
+  background-color: var(--secondary-color);
   color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-  padding: 4px 8px;
+  border: none;
+  padding: 5px 10px;
+  font-size: 1em;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 5px;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  border: 2px solid var(--primary-color); /* Add border */
 }
 
 .close-select:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  transform: scale(1.05);
+  border-color: var(--secondary-color); /* Change border color on hover */
 }
 
 .input-group {
@@ -396,23 +324,17 @@ th {
 .submit-button {
   margin-top: 15px;
   padding: 10px 20px;
-  background-color: var(--third-color);
-  color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   border: 2px solid var(--primary-color);
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: calc(var(--base-font-size) * var(--scale-normal));
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
 }
 
 .submit-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  transform: scale(1.05);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 button:hover {
@@ -438,12 +360,14 @@ button:hover {
   flex-wrap: wrap; /* Allow wrapping to a new row */
   gap: 10px; /* Add spacing between buttons */
   justify-content: center; /* Center buttons horizontally */
+  flex-direction: column;
+  margin: 0;
 }
 
 .dynamic-button {
   display: block;
-  padding: 15px 30px; /* Increase padding for a larger button */
-  font-size: calc(var(--base-font-size) * var(--scale-medium)); /* Increase font size */
+  padding: 12px 24px; /* Reduced from 15px 30px */
+  font-size: 1.2em; /* Increase font size */
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
@@ -451,7 +375,7 @@ button:hover {
   cursor: pointer;
   font-weight: bold;
   text-align: center;
-  max-width: 200px; /* Set maximum width for the button */
+  max-width: 160px; /* Reduced from 200px */
   width: 100%; /* Allow the button to shrink if needed */
   box-sizing: border-box; /* Include padding and border in the width */
   word-wrap: break-word; /* Ensure text wraps to a new row */
@@ -459,25 +383,27 @@ button:hover {
 }
 
 .dynamic-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  transform: scale(1.05);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .time-table {
   display: none; /* Initially hidden */
   background-color: var(--secondary-color);
   color: var(--primary-color);
-  padding: 20px;
+  padding: 18px; /* Reduced from 20px */
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
   position: fixed;
-  top: 10%; /* Start below the header */
+  top: var(--header-height); /* Start below the header */
   left: var(--sidebar-width); /* Start next to the left sidebar */
-  width: calc(100% - var(--sidebar-width)); /* Fill the remaining width */
-  height: 90%; /* Fill the remaining height below the header */
-  overflow-y: auto; /* Add scrolling if content overflows */
+  width: calc(99% - var(--sidebar-width)); /* Fill the remaining width */
+  height: calc(100% - var(--header-height)); /* Fill the remaining height below the header */
+  overflow: hidden; /* Change from auto to hidden */
   text-align: center;
+  font-size: 0.9em; /* Make all text 10% smaller */
+  box-sizing: border-box;
+  margin-left: 1.5%;
 }
 
 .week-table {
@@ -489,11 +415,11 @@ button:hover {
 
 .week-table th, .week-table td {
   border: 1px solid var(--primary-color);
-  padding: 8px;
+  padding: 7px; /* Reduced from 8px */
   text-align: center;
   color: var(--primary-color);
-  min-width: 80px;
-  height: 30px;
+  min-width: 72px; /* Reduced from 80px */
+  height: 36px; /* Increased from 27px by 20% */
 }
 
 .week-table th {
@@ -510,14 +436,17 @@ button:hover {
 }
 
 .week-table td[contenteditable="true"] {
-  outline: 2px dashed var(--primary-color); /* Highlight editable cells */
-  cursor: text;
-  pointer-events: auto !important;
+  cursor: text !important;
   user-select: text !important;
   -webkit-user-select: text !important;
   -moz-user-select: text !important;
   -ms-user-select: text !important;
-  cursor: text !important;
+  outline: none;
+}
+
+.week-table td[contenteditable="true"]:focus {
+  background-color: #666 !important;
+  outline: 2px solid var(--primary-color);
 }
 
 .week-table td.editable {
@@ -547,55 +476,64 @@ button:hover {
   outline: 2px solid var(--primary-color);
 }
 
+.week-table td.current-day {
+  background-color: #555;
+  font-weight: bold;
+}
+
+.permanent-hour {
+  background-color: #666;
+  font-weight: bold;
+  border: 2px dashed var(--primary-color);
+}
+
 .time-table-buttons {
-  margin-top: 20px; /* Add spacing above the buttons */
+  margin-top: 18px; /* Reduced from 20px */
   display: flex;
   justify-content: center; /* Center the buttons horizontally */
-  gap: 15px; /* Add spacing between the buttons */
+  gap: 13px; /* Reduced from 15px */
 }
 
 .edit-button,
 .operator-button {
-  padding: 10px 20px;
-  font-size: calc(var(--base-font-size) * var(--scale-normal));
-  background-color: var(--third-color);
-  color: var(--primary-color);
+  padding: 10px 20px; /* Reduced from 10px 20px */
+  font-size: 1em; /* Make button text 10% smaller */
+  background-color: var(--primary-color);
+  color: var (--secondary-color);
   border: 2px solid var(--primary-color);
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  text-align: center;
 }
 
 .edit-button:hover,
 .operator-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  transform: scale(1.05);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .save-button {
-  padding: 10px 20px;
-  font-size: calc(var(--base-font-size) * var(--scale-normal));
-  background-color: var(--third-color);
-  color: var(--primary-color);
+  padding: 10px 20px; /* Reduced from 10px 20px */
+  font-size: 1em; /* Make button text 10% smaller */
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   border: 2px solid var(--primary-color);
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  text-align: center;
 }
 
 .save-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  transform: scale(1.05);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+/* Remove the copy-all-button styles */
+.copy-all-button,
+.copy-all-button:hover {
+  display: none;
 }
 
 .verification-window {
@@ -642,7 +580,7 @@ button:hover {
 
 .verification-buttons button {
   padding: 10px 20px;
-  font-size: calc(var(--base-font-size) * var(--scale-normal));
+  font-size: 1em;
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
@@ -656,74 +594,208 @@ button:hover {
   color: var(--primary-color);
 }
 
-.selectable {
-  cursor: pointer;
-}
-
-.selectable:hover {
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 5px;
   background-color: var(--secondary-color);
   color: var(--primary-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 2500;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
 }
 
-.selected-date {
-  background-color: var(--primary-color) !important;
-  color: var(--secondary-color) !important;
-  font-weight: bold;
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.calendar-controls {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.confirm-date-button {
-  padding: 10px 20px;
-  font-size: calc(var(--base-font-size) * var(--scale-normal));
-  background-color: var(--third-color);
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: bold;
+.timetable-content {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;  /* Change to row to place items side by side */
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: space-between; /* Spread items apart */
+}
+
+.table-container {
+  width: calc(100% - 288px); /* Account for calendar width (270px) + gap (18px) */
+}
+
+.timetable-calendar {
+  flex: 0 0 270px;
+  padding: 13px;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-left: auto; /* Push calendar to the right */
+  align-self: flex-start;
+  position: sticky;
+  top: var(--header-height); /* Stick to top below header */
+}
+
+.week-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.timetable-calendar {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 13px; /* Reduced from 15px */
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timetable-calendar .calendar {
+  margin-top: 15px;
+}
+
+.week-table {
+  flex: 1;
+}
+
+.timetable-content {
+  display: flex;
+  gap: 18px; /* Reduced from 20px */
+  margin-bottom: 18px; /* Reduced from 20px */
+}
+
+.timetable-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.timetable-right {
+  flex: 0 0 270px; /* Reduced from 300px */
+}
+
+.time-table-buttons {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 13px; /* Reduced from 15px */
+  justify-content: flex-start;
+}
+
+.timetable-calendar {
+  padding: 13px; /* Reduced from 15px */
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timetable-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.bottom-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.time-table-buttons {
+  display: flex;
+  gap: 13px;
+}
+
+.timetable-calendar {
+  flex: 0 0 270px;
+  padding: 13px;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+}
+
+.timetable-content {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.timetable-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.time-table-buttons {
+  margin: 10px 0;
+  display: flex;
+  gap: 13px;
+  justify-content: flex-start;
+  padding-left: 2.5%; /* Match the table's margin */
+}
+
+.timetable-calendar {
+  flex: 0 0 270px;
+  padding: 13px;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
+}
+
+.date-cell {
+  font-size: 0.9em;
+  color: var(--primary-color);
+  font-weight: normal;
+  text-align: center;
+  background-color: var(--secondary-color);
+}
+
+.dates:hover,
+.month-dates:hover,
+.current-date:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.confirm-date-button:hover {
+.window-controls {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.window-controls button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.window-controls button:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  transform: scale(1.05);
-}
-
-.selected-date-display {
-    color: var(--primary-color);
-    font-size: calc(var(--base-font-size) * var(--scale-medium));
-    text-align: center;
-    margin: 10px 0;
-    padding: 10px;
-    background-color: var(--secondary-color);
-    border-radius: 5px;
-    border: 1px solid var(--primary-color);
-}
-
-.class-calendar {
-  position: fixed;
-  top: 10%; /* Align with header bottom */
-  left: var(--sidebar-width); /* Align with sidebar edge */
-  width: calc(100% - var(--sidebar-width)); /* Take remaining width */
-  height: 90%;
-  padding: 20px;
-  box-sizing: border-box;
-  z-index: 100;
-}
-
-.calendar-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: var(--secondary-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
