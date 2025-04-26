@@ -1,0 +1,17 @@
+{
+  "name": "day-app",
+  "version": "5.0.0",
+  "description": "little project of mine and one of mine friends",
+  "license": "ISC",
+  "author": "Alex Hanzal, Štěpán Kádár",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "devDependencies": {
+    "electron": "^35.1.5"
+  },
+  "json.validate.enable": false
+}
