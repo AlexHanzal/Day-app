@@ -1,1 +1,3 @@
-- Added timetable saving functions for loading data between resets
+- Added class edit functionality (name change and deletion)
+- Made permanent hours saving system more compact
+- Moved calendar styles into separate .css file

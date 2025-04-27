@@ -97,83 +97,6 @@ ul {
   padding: 0;
   margin: 0;
 }
-.current-date{
-  font-size: clamp(14.8px, 1.6vw, 29.6px); /* Reduced by 20% */
-  color: var(--fifth-color);
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
-  background-color: #232323c9;
-  border-radius: 8px; /* Make the border round */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow effect */
-}
-.dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
-  color: var(--primary-color);
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
-}
-.calendar-title{
-  text-align: center;
-}
-
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px; /* Add spacing between the buttons and the title */
-}
-
-.calendar-header .calendar-title {
-  font-weight: bold;
-  font-size: 1.5em;
-  text-align: center;
-}
-
-.prev-button,
-.next-button {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  border: none;
-  padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold; /* Make the text bolder */
-}
-
-.prev-button:hover,
-.next-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-}
-
-.calendar-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px; /* Add spacing above the buttons */
-}
-
-.calendar-buttons .prev-button,
-.calendar-buttons .next-button {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  border: none;
-  padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold; /* Make the text bolder */
-}
-
-.calendar-buttons .prev-button:hover,
-.calendar-buttons .next-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-}
 
 td {
   padding: 0; /* Remove padding from all cells */
@@ -183,14 +106,6 @@ td {
   height: 40px; /* Set a consistent height for cells */
   vertical-align: middle; /* Center align text vertically */
   border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
-}
-.month-dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
-  color: #9d9d9d9f;
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
 }
 
 table {
@@ -627,35 +542,9 @@ button:hover {
   width: calc(100% - 288px); /* Account for calendar width (270px) + gap (18px) */
 }
 
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: auto; /* Push calendar to the right */
-  align-self: flex-start;
-  position: sticky;
-  top: var(--header-height); /* Stick to top below header */
-}
-
 .week-table {
   width: 100%;
   margin-bottom: 20px;
-}
-
-.timetable-calendar {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 13px; /* Reduced from 15px */
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.timetable-calendar .calendar {
-  margin-top: 15px;
 }
 
 .week-table {
@@ -685,13 +574,6 @@ button:hover {
   justify-content: flex-start;
 }
 
-.timetable-calendar {
-  padding: 13px; /* Reduced from 15px */
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .timetable-content {
   display: flex;
   flex-direction: column;
@@ -711,15 +593,6 @@ button:hover {
 .time-table-buttons {
   display: flex;
   gap: 13px;
-}
-
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: auto;
 }
 
 .timetable-content {
@@ -747,32 +620,12 @@ button:hover {
   padding-left: 2.5%; /* Match the table's margin */
 }
 
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  align-self: flex-start;
-  position: sticky;
-  top: 0;
-}
-
 .date-cell {
   font-size: 0.9em;
   color: var(--primary-color);
   font-weight: normal;
   text-align: center;
   background-color: var(--secondary-color);
-}
-
-.dates:hover,
-.month-dates:hover,
-.current-date:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .window-controls {
@@ -798,4 +651,170 @@ button:hover {
 .window-controls button:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
+}
+
+.class-button-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 200px; /* Increased to accommodate both buttons */
+  margin: 10px auto;
+}
+
+.dynamic-button {
+  display: block;
+  padding: 12px 24px; /* Reduced from 15px 30px */
+  font-size: 1.2em; /* Increase font size */
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  max-width: 160px; /* Reduced from 200px */
+  width: 100%; /* Allow the button to shrink if needed */
+  box-sizing: border-box; /* Include padding and border in the width */
+  word-wrap: break-word; /* Ensure text wraps to a new row */
+  white-space: normal; /* Allow text to break into multiple lines */
+  margin: 0; /* Remove margin since container handles spacing */
+}
+
+.dynamic-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.edit-class-button {
+  position: static;
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 12px 15px;  /* Match dynamic-button padding */
+  font-size: 1em;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: calc(100% - 4px); /* Account for borders */
+  align-self: stretch; /* Make button stretch to container height */
+  margin: auto 0; /* Center vertically */
+}
+
+.edit-class-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.edit-menu {
+  display: none;
+  position: absolute;
+  right: -120px;
+  top: 0;
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.edit-menu.active {
+  display: block;
+}
+
+.edit-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.edit-menu button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.confirmation-dialog {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirmation-content {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirmation-buttons button {
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid var(--primary-color);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.confirmation-buttons button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.class-name-edit {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-content {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.edit-content input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  background-color: var(--third-color);
+  color: var(--primary-color);
+  box-sizing: border-box;
 }

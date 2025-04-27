@@ -201,20 +201,10 @@ function updateTimetableForWeek(newSelectedDate) {
 function checkIfPermanentHour(dayIndex, colIndex, content) {
   if (!currentTimetableName || !content) return false;
   
-  // Check if this content appears on the same day and column for all weeks
-  const startDate = new Date(currentYear, 0, 1);
-  const endDate = new Date(currentYear + 1, 0, 1);
+  const dayKey = `${dayIndex + 1}`; // +1 because Monday is 1, Sunday is 0
+  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayKey]?.[colIndex];
   
-  for (let d = new Date(startDate); d < endDate; d.setDate(d.getDate() + 1)) {
-    if (d.getDay() === dayIndex + 1) { // +1 because Monday is 1, Sunday is 0
-      const dateKey = formatDateKey(d);
-      const cellContent = timetableData[currentTimetableName]?.[dateKey]?.[colIndex];
-      if (cellContent !== content) {
-        return false;
-      }
-    }
-  }
-  return true;
+  return permanentContent === content;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -274,17 +264,7 @@ document.getElementById('submit-button').addEventListener('click', () => {
     }
 
     const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = document.createElement('button');
-    newButton.textContent = nameInput;
-    newButton.className = "dynamic-button";
-    newButton.addEventListener('click', () => {
-      const timeTable = document.querySelector('.time-table');
-      const timeTableTitle = timeTable.querySelector('h2');
-      timeTableTitle.textContent = nameInput; // Set the time table title
-      currentTimetableName = nameInput; // Set current timetable
-      timeTable.style.display = 'block'; // Show the time table
-      updateTimetableForWeek(selectedDate); // Refresh with correct data
-    });
+    const newButton = createClassButton(nameInput);
     dynamicLinksContainer.appendChild(newButton);
 
     // Clear the input and hide the select screen
@@ -366,15 +346,7 @@ document.getElementById('submit-button').addEventListener('click', () => {
   const nameInput = document.getElementById('name-input').value.trim();
   if (nameInput) {
     const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = document.createElement('button');
-    newButton.textContent = nameInput;
-    newButton.className = "dynamic-button";
-    newButton.addEventListener('click', () => {
-      const timeTable = document.querySelector('.time-table');
-      if (timeTable) {
-        timeTable.style.display = 'block'; // Show the time table div
-      }
-    });
+    const newButton = createClassButton(nameInput);
     dynamicLinksContainer.appendChild(newButton);
 
     // Clear the input and hide the select screen
@@ -456,26 +428,52 @@ document.getElementById('confirm-verification').addEventListener('click', () => 
 function saveToAllWeeksForCurrentTimetable(dayIndex, colIndex, content) {
   if (!currentTimetableName) return;
 
-  // Calculate dates for the whole year
-  const startDate = new Date(currentYear, 0, 1);
-  const endDate = new Date(currentYear + 1, 0, 1);
-  
-  for (let d = startDate; d < endDate; d.setDate(d.getDate() + 1)) {
-    if (d.getDay() === dayIndex + 1) { // +1 because Monday is 1, Sunday is 0
-      const dateKey = formatDateKey(d);
-      if (!timetableData[currentTimetableName]) {
-        timetableData[currentTimetableName] = {};
-      }
-      if (!timetableData[currentTimetableName][dateKey]) {
-        timetableData[currentTimetableName][dateKey] = {};
-      }
-      timetableData[currentTimetableName][dateKey][colIndex] = content;
-    }
+  // Use a more compact format for permanent hours
+  if (!timetableData[currentTimetableName]) {
+    timetableData[currentTimetableName] = {};
   }
+  
+  if (!timetableData[currentTimetableName].permanentHours) {
+    timetableData[currentTimetableName].permanentHours = {};
+  }
+
+  // Store by day and column instead of by date
+  const dayKey = `${dayIndex + 1}`; // +1 because Monday is 1, Sunday is 0
+  if (!timetableData[currentTimetableName].permanentHours[dayKey]) {
+    timetableData[currentTimetableName].permanentHours[dayKey] = {};
+  }
+  
+  timetableData[currentTimetableName].permanentHours[dayKey][colIndex] = content;
+  
+  // Save changes to file
+  saveTimeTableToFile(currentTimetableName);
 }
 
-// Remove or comment out the old saveToAllWeeks function
-// function saveToAllWeeks(dayIndex, colIndex, content) { ... }
+// Update the getCellContent function to check permanent hours first
+function getCellContent(date, columnIndex) {
+  if (!currentTimetableName) return '';
+  
+  // First check if there's a permanent hour for this day
+  const dayOfWeek = date.getDay() || 7; // Convert Sunday (0) to 7
+  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayOfWeek]?.[columnIndex];
+  if (permanentContent) {
+    return permanentContent;
+  }
+  
+  // If no permanent hour, check for specific date content
+  const dateKey = formatDateKey(date);
+  return timetableData[currentTimetableName]?.[dateKey]?.[columnIndex] || '';
+}
+
+// Update the checkIfPermanentHour function to use the new format
+function checkIfPermanentHour(dayIndex, colIndex, content) {
+  if (!currentTimetableName || !content) return false;
+  
+  const dayKey = `${dayIndex + 1}`; // +1 because Monday is 1, Sunday is 0
+  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayKey]?.[colIndex];
+  
+  return permanentContent === content;
+}
 
 document.querySelector('.edit-button').addEventListener('click', () => {
   const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
@@ -622,6 +620,14 @@ function saveCellContent(date, columnIndex, content) {
 function getCellContent(date, columnIndex) {
   if (!currentTimetableName) return '';
   
+  // First check if there's a permanent hour for this day
+  const dayOfWeek = date.getDay() || 7; // Convert Sunday (0) to 7
+  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayOfWeek]?.[columnIndex];
+  if (permanentContent) {
+    return permanentContent;
+  }
+  
+  // If no permanent hour, check for specific date content
   const dateKey = formatDateKey(date);
   return timetableData[currentTimetableName]?.[dateKey]?.[columnIndex] || '';
 }
@@ -689,20 +695,7 @@ document.getElementById('submit-button').addEventListener('click', () => {
     saveTimeTableToFile(nameInput);
 
     const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = document.createElement('button');
-    newButton.textContent = nameInput;
-    newButton.className = "dynamic-button";
-    newButton.addEventListener('click', () => {
-      const timeTable = document.querySelector('.time-table');
-      const timeTableTitle = timeTable.querySelector('h2');
-      timeTableTitle.textContent = nameInput;
-      currentTimetableName = nameInput;
-      
-      // Load timetable data when selected
-      loadTimeTableFromFile(nameInput);
-      timeTable.style.display = 'block';
-      updateTimetableForWeek(selectedDate);
-    });
+    const newButton = createClassButton(nameInput);
     dynamicLinksContainer.appendChild(newButton);
 
     document.getElementById('name-input').value = '';
@@ -756,18 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
     files.forEach(file => {
       if (file.endsWith('.json')) {
         const timetableName = path.basename(file, '.json');
-        const button = document.createElement('button');
-        button.textContent = timetableName;
-        button.className = "dynamic-button";
-        button.addEventListener('click', () => {
-          const timeTable = document.querySelector('.time-table');
-          const timeTableTitle = timeTable.querySelector('h2');
-          timeTableTitle.textContent = timetableName;
-          currentTimetableName = timetableName;
-          loadTimeTableFromFile(timetableName);
-          timeTable.style.display = 'block';
-          updateTimetableForWeek(selectedDate);
-        });
+        const button = createClassButton(timetableName);
         document.getElementById('dynamic-links-container').appendChild(button);
       }
     });
@@ -775,4 +757,348 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Error loading timetables:', error);
   }
 });
+
+function updateEditMenu(container, className) {
+  // Remove old menu if it exists
+  const oldMenu = container.querySelector('.edit-menu');
+  if (oldMenu) {
+    oldMenu.remove();
+  }
+
+  // Create new menu
+  const editMenu = document.createElement('div');
+  editMenu.className = 'edit-menu';
+  editMenu.innerHTML = `
+    <button class="rename-button">Rename</button>
+    <button class="delete-button">Delete</button>
+  `;
+
+  // Add click handlers
+  editMenu.querySelector('.rename-button').addEventListener('click', () => {
+    editMenu.classList.remove('active');
+    showRenameDialog(className, container);
+  });
+
+  editMenu.querySelector('.delete-button').addEventListener('click', () => {
+    showDeleteConfirmation(className, container);
+    editMenu.classList.remove('active');
+  });
+
+  container.appendChild(editMenu);
+  return editMenu;
+}
+
+function renameClass(oldName, newName, container) {
+  const oldPath = path.join(CLASSES_DIR, `${oldName}.json`);
+  const newPath = path.join(CLASSES_DIR, `${newName}.json`);
+
+  try {
+    // Read existing data
+    const data = JSON.parse(fs.readFileSync(oldPath, 'utf8'));
+    
+    // Write to new file
+    fs.writeFileSync(newPath, JSON.stringify(data, null, 2));
+    
+    // Delete old file
+    fs.unlinkSync(oldPath);
+    
+    // Update data structures
+    timetableData[newName] = timetableData[oldName];
+    delete timetableData[oldName];
+    
+    // Update UI elements
+    const button = container.querySelector('.dynamic-button');
+    button.textContent = newName;
+    
+    // Update the edit menu
+    const editButton = container.querySelector('.edit-class-button');
+    const editMenu = updateEditMenu(container, newName);
+    
+    editButton.onclick = (e) => {
+      e.stopPropagation();
+      editMenu.classList.toggle('active');
+    };
+    
+    // Update timetable title and current name if this was the active timetable
+    if (currentTimetableName === oldName) {
+      currentTimetableName = newName;
+      // Update both the h2 title and class title above timetable
+      document.querySelectorAll('.time-table h2, .class-title').forEach(el => {
+        if (el) el.textContent = newName;
+      });
+    }
+    
+    showNotification('Class renamed successfully!');
+  } catch (error) {
+    console.error('Error renaming class:', error);
+    showNotification('Error renaming class!');
+  }
+}
+
+function createClassButton(timetableName) {
+  const container = document.createElement('div');
+  container.className = 'class-button-container';
+
+  const button = document.createElement('button');
+  button.textContent = timetableName;
+  button.className = 'dynamic-button';
+  
+  const editButton = document.createElement('button');
+  editButton.innerHTML = '✎';
+  editButton.className = 'edit-class-button';
+  editButton.title = 'Edit class';
+
+  container.appendChild(button);
+  container.appendChild(editButton);
+
+  // Add click handlers
+  button.addEventListener('click', () => {
+    const timeTable = document.querySelector('.time-table');
+    const timeTableTitle = timeTable.querySelector('h2');
+    timeTableTitle.textContent = timetableName;
+    currentTimetableName = timetableName;
+    loadTimeTableFromFile(timetableName);
+    timeTable.style.display = 'block';
+    updateTimetableForWeek(selectedDate);
+  });
+
+  // Create and setup edit menu
+  const editMenu = updateEditMenu(container, timetableName);
+  
+  editButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editMenu.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      editMenu.classList.remove('active');
+    }
+  });
+
+  return container;
+}
+
+function showRenameDialog(oldName, container) {
+  const dialog = document.createElement('div');
+  dialog.className = 'verification-window';
+  dialog.style.display = 'flex';
+  dialog.innerHTML = `
+    <div class="verification-content">
+      <h3>Rename Class</h3>
+      <input type="text" id="new-name-input" value="${oldName}">
+      <div class="verification-buttons">
+        <button id="confirm-rename">Save</button>
+        <button id="cancel-rename">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(dialog);
+  const input = dialog.querySelector('#new-name-input');
+  input.focus();
+  input.select();
+
+  const handleRename = () => {
+    const newName = input.value.trim();
+    if (newName && newName !== oldName) {
+      renameClass(oldName, newName, container);
+    }
+    dialog.remove();
+  };
+
+  // Add enter key handler
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleRename();
+    }
+  });
+
+  dialog.querySelector('#confirm-rename').addEventListener('click', handleRename);
+  dialog.querySelector('#cancel-rename').addEventListener('click', () => {
+    dialog.remove();
+  });
+}
+
+function showDeleteConfirmation(timetableName, container) {
+  const dialog = document.createElement('div');
+  dialog.className = 'verification-window';
+  dialog.style.display = 'flex';
+  dialog.innerHTML = `
+    <div class="verification-content">
+      <h3>Delete Class</h3>
+      <p>Are you sure you want to delete "${timetableName}"?</p>
+      <p>This action cannot be undone.</p>
+      <div class="verification-buttons">
+        <button id="confirm-delete">Delete</button>
+        <button id="cancel-delete">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(dialog);
+
+  dialog.querySelector('#confirm-delete').addEventListener('click', () => {
+    showFinalDeleteConfirmation(timetableName, container);
+    dialog.remove();
+  });
+
+  dialog.querySelector('#cancel-delete').addEventListener('click', () => {
+    dialog.remove();
+  });
+}
+
+function showFinalDeleteConfirmation(timetableName, container) {
+  const dialog = document.createElement('div');
+  dialog.className = 'verification-window';
+  dialog.style.display = 'flex';
+  dialog.innerHTML = `
+    <div class="verification-content">
+      <h3>Final Confirmation</h3>
+      <p>Are you absolutely sure you want to delete "${timetableName}"?</p>
+      <div class="verification-buttons">
+        <button id="final-confirm-delete">Yes, Delete</button>
+        <button id="final-cancel-delete">No, Keep</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(dialog);
+
+  dialog.querySelector('#final-confirm-delete').addEventListener('click', () => {
+    deleteClass(timetableName, container);
+    dialog.remove();
+  });
+
+  dialog.querySelector('#final-cancel-delete').addEventListener('click', () => {
+    dialog.remove();
+  });
+}
+
+function deleteClass(timetableName, container) {
+  const filePath = path.join(CLASSES_DIR, `${timetableName}.json`);
+  try {
+    // Delete the JSON file
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    // Remove from data structure
+    delete timetableData[timetableName];
+    
+    // Remove from UI
+    container.remove();
+    
+    // If this was the active timetable, hide and reset it
+    if (currentTimetableName === timetableName) {
+      currentTimetableName = null;
+      const timeTable = document.querySelector('.time-table');
+      timeTable.style.display = 'none';
+      const timeTableTitle = timeTable.querySelector('h2');
+      if (timeTableTitle) {
+        timeTableTitle.textContent = '';
+      }
+    }
+    
+    showNotification('Class deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting class:', error);
+    showNotification('Error deleting class!');
+  }
+}
+
+function renameClass(oldName, newName, container) {
+  const oldPath = path.join(CLASSES_DIR, `${oldName}.json`);
+  const newPath = path.join(CLASSES_DIR, `${newName}.json`);
+
+  try {
+    // Read existing data
+    const data = JSON.parse(fs.readFileSync(oldPath, 'utf8'));
+    
+    // Write to new file
+    fs.writeFileSync(newPath, JSON.stringify(data, null, 2));
+    
+    // Delete old file
+    fs.unlinkSync(oldPath);
+    
+    // Update data structures
+    timetableData[newName] = timetableData[oldName];
+    delete timetableData[oldName];
+    
+    // Update UI
+    const button = container.querySelector('.dynamic-button');
+    button.textContent = newName;
+    
+    // Update the edit menu with new name
+    const editButton = container.querySelector('.edit-class-button');
+    const editMenu = updateEditMenu(container, newName);
+    
+    // Reconnect edit button click handler
+    editButton.onclick = (e) => {
+      e.stopPropagation();
+      editMenu.classList.toggle('active');
+    };
+    
+    // Update current timetable name if this was the active timetable
+    if (currentTimetableName === oldName) {
+      currentTimetableName = newName;
+      const timeTableTitle = document.querySelector('.time-table h2');
+      if (timeTableTitle) {
+        timeTableTitle.textContent = newName;
+      }
+    }
+    
+    showNotification('Class renamed successfully!');
+  } catch (error) {
+    console.error('Error renaming class:', error);
+    showNotification('Error renaming class!');
+  }
+}
+
+function createClassButton(timetableName) {
+  const container = document.createElement('div');
+  container.className = 'class-button-container';
+
+  const button = document.createElement('button');
+  button.textContent = timetableName;
+  button.className = 'dynamic-button';
+  
+  const editButton = document.createElement('button');
+  editButton.innerHTML = '✎';
+  editButton.className = 'edit-class-button';
+  editButton.title = 'Edit class';
+
+  container.appendChild(button);
+  container.appendChild(editButton);
+
+  // Add click handlers
+  button.addEventListener('click', () => {
+    const timeTable = document.querySelector('.time-table');
+    const timeTableTitle = timeTable.querySelector('h2');
+    timeTableTitle.textContent = timetableName;
+    currentTimetableName = timetableName;
+    loadTimeTableFromFile(timetableName);
+    timeTable.style.display = 'block';
+    updateTimetableForWeek(selectedDate);
+  });
+
+  // Create and setup edit menu
+  const editMenu = updateEditMenu(container, timetableName);
+  
+  editButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editMenu.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      editMenu.classList.remove('active');
+    }
+  });
+
+  return container;
+}
 
