@@ -8,7 +8,9 @@ function createWindow() {
         fullscreen: true,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            enableRemoteModule: true,
+            webSecurity: true
         }
     });
 
@@ -19,7 +21,7 @@ app.whenReady().then(createWindow);
 
 // Handle directory selection
 ipcMain.handle('select-directory', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
+    const result = await dialog.showOpenDialog({
         properties: ['openDirectory'],
         title: 'Select Directory for Class Data Files'
     });
