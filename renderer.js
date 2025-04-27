@@ -1,13 +1,45 @@
 const fs = require('fs');
 const path = require('path');
+const { remote } = require('electron');
+const timetable = require('./timetable');
 
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let selectedDate = new Date(); // Add this to track selected date
 let timetableData = {};
 let currentTimetableName = null;
+let isAdminMode = false; // Add this at the top with other global variables
 
-const CLASSES_DIR = path.join(__dirname, 'classes');
+// Make CLASSES_DIR variable modifiable
+let CLASSES_DIR = path.join(__dirname, 'classes');
+
+// Load saved directory path on startup
+function loadSettings() {
+  try {
+    const settingsPath = path.join(__dirname, 'settings.json');
+    if (fs.existsSync(settingsPath)) {
+      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+      if (settings.classesDir && fs.existsSync(settings.classesDir)) {
+        CLASSES_DIR = settings.classesDir;
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading settings:', error);
+  }
+  return false;
+}
+
+function saveSettings(settings) {
+  try {
+    const settingsPath = path.join(__dirname, 'settings.json');
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    return false;
+  }
+}
 
 // Create classes directory if it doesn't exist
 if (!fs.existsSync(CLASSES_DIR)) {
@@ -382,43 +414,50 @@ document.getElementById('verification-code').addEventListener('keypress', (event
 document.getElementById('confirm-verification').addEventListener('click', () => {
   const codeInput = document.getElementById('verification-code').value.trim();
   if (codeInput === '1918') {
+    isAdminMode = true; // Set admin mode
     showNotification('Access granted!');
     const verificationWindow = document.getElementById('verification-window');
     verificationWindow.style.display = 'none';
 
-    if (!currentTimetableName) {
-      showNotification('Please select a timetable first');
-      return;
-    }
+    // Show edit buttons for all classes immediately
+    document.querySelectorAll('.edit-class-button').forEach(button => {
+      button.style.display = 'block';
+    });
 
-    // Simple table editing with focus management
-    const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
-    tableCells.forEach(cell => {
-      cell.contentEditable = 'true';
-      cell.style.backgroundColor = '#555';
-      
-      // Modified input handler for operator mode
-      cell.addEventListener('input', function() {
-        const content = this.textContent.trim();
-        if (content !== '') {
-          this.classList.add('permanent-hour');
-          // Get position in timetable
+    // Enable cell editing if a timetable is currently open
+    if (currentTimetableName) {
+      const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
+      tableCells.forEach(cell => {
+        cell.contentEditable = 'true';
+        cell.style.backgroundColor = '#555';
+        
+        // Add input handler for operator mode
+        cell.addEventListener('input', function() {
+          const content = this.textContent.trim();
           const row = this.parentElement;
           const rowIndex = Array.from(row.parentElement.children).indexOf(row);
           const colIndex = Array.from(row.children).indexOf(this) - 1;
           
-          // Save to all weeks for current timetable only
-          saveToAllWeeksForCurrentTimetable(rowIndex, colIndex, content);
-        } else {
-          this.classList.remove('permanent-hour');
-        }
+          if (content !== '') {
+            this.classList.add('permanent-hour');
+            saveToAllWeeksForCurrentTimetable(rowIndex, colIndex, content);
+          } else {
+            this.classList.remove('permanent-hour');
+            if (timetableData[currentTimetableName]?.permanentHours?.[rowIndex + 1]) {
+              delete timetableData[currentTimetableName].permanentHours[rowIndex + 1][colIndex];
+              if (Object.keys(timetableData[currentTimetableName].permanentHours[rowIndex + 1]).length === 0) {
+                delete timetableData[currentTimetableName].permanentHours[rowIndex + 1];
+              }
+              saveTimeTableToFile(currentTimetableName);
+            }
+          }
+        });
+        
+        cell.addEventListener('click', function() {
+          this.focus();
+        });
       });
-      
-      // Add focus handling
-      cell.addEventListener('click', function() {
-        this.focus();
-      });
-    });
+    }
   } else {
     showNotification('Invalid code. Please try again.');
   }
@@ -443,36 +482,21 @@ function saveToAllWeeksForCurrentTimetable(dayIndex, colIndex, content) {
     timetableData[currentTimetableName].permanentHours[dayKey] = {};
   }
   
-  timetableData[currentTimetableName].permanentHours[dayKey][colIndex] = content;
-  
-  // Save changes to file
-  saveTimeTableToFile(currentTimetableName);
-}
-
-// Update the getCellContent function to check permanent hours first
-function getCellContent(date, columnIndex) {
-  if (!currentTimetableName) return '';
-  
-  // First check if there's a permanent hour for this day
-  const dayOfWeek = date.getDay() || 7; // Convert Sunday (0) to 7
-  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayOfWeek]?.[columnIndex];
-  if (permanentContent) {
-    return permanentContent;
+  if (content === '') {
+    // Remove the permanent hour entry if content is empty
+    delete timetableData[currentTimetableName].permanentHours[dayKey][colIndex];
+    
+    // Clean up empty day objects
+    if (Object.keys(timetableData[currentTimetableName].permanentHours[dayKey]).length === 0) {
+      delete timetableData[currentTimetableName].permanentHours[dayKey];
+    }
+  } else {
+    // Add or update the permanent hour
+    timetableData[currentTimetableName].permanentHours[dayKey][colIndex] = content;
   }
   
-  // If no permanent hour, check for specific date content
-  const dateKey = formatDateKey(date);
-  return timetableData[currentTimetableName]?.[dateKey]?.[columnIndex] || '';
-}
-
-// Update the checkIfPermanentHour function to use the new format
-function checkIfPermanentHour(dayIndex, colIndex, content) {
-  if (!currentTimetableName || !content) return false;
-  
-  const dayKey = `${dayIndex + 1}`; // +1 because Monday is 1, Sunday is 0
-  const permanentContent = timetableData[currentTimetableName]?.permanentHours?.[dayKey]?.[colIndex];
-  
-  return permanentContent === content;
+  // Save changes to file immediately
+  saveTimeTableToFile(currentTimetableName);
 }
 
 document.querySelector('.edit-button').addEventListener('click', () => {
@@ -502,6 +526,7 @@ document.querySelector('.edit-button').addEventListener('click', () => {
         
         // Save only to specific date
         saveCellContent(cellDate, colIndex, this.textContent);
+        saveTimeTableToFile(currentTimetableName);
       });
 
       cell.parentNode.replaceChild(newCell, cell);
@@ -614,7 +639,17 @@ function saveCellContent(date, columnIndex, content) {
   if (!timetableData[currentTimetableName][dateKey]) {
     timetableData[currentTimetableName][dateKey] = {};
   }
-  timetableData[currentTimetableName][dateKey][columnIndex] = content;
+  if (content === '') {
+    // Remove the entry if content is empty
+    delete timetableData[currentTimetableName][dateKey][columnIndex];
+    
+    // Clean up empty date objects
+    if (Object.keys(timetableData[currentTimetableName][dateKey]).length === 0) {
+      delete timetableData[currentTimetableName][dateKey];
+    }
+  } else {
+    timetableData[currentTimetableName][dateKey][columnIndex] = content;
+  }
 }
 
 function getCellContent(date, columnIndex) {
@@ -690,14 +725,32 @@ function loadTimeTableFromFile(timetableName) {
 document.getElementById('submit-button').addEventListener('click', () => {
   const nameInput = document.getElementById('name-input').value.trim();
   if (nameInput) {
-    // Initialize data structure and create JSON file
-    timetableData[nameInput] = {};
-    saveTimeTableToFile(nameInput);
+    // Initialize empty data structure for the new class
+    const initialData = {
+      permanentHours: {}  // Initialize with empty permanent hours object
+    };
+    
+    // Create JSON file immediately
+    const filePath = path.join(CLASSES_DIR, `${nameInput}.json`);
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2));
+      
+      // Store in memory
+      timetableData[nameInput] = initialData;
+      
+      // Create and add the button
+      const dynamicLinksContainer = document.getElementById('dynamic-links-container');
+      const newButton = createClassButton(nameInput);
+      dynamicLinksContainer.appendChild(newButton);
 
-    const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = createClassButton(nameInput);
-    dynamicLinksContainer.appendChild(newButton);
+      showNotification('Class created successfully!');
+    } catch (error) {
+      console.error('Error creating class file:', error);
+      showNotification('Error creating class!');
+      return;
+    }
 
+    // Clear input and close dialog
     document.getElementById('name-input').value = '';
     const selectScreen = document.getElementById('select-screen');
     selectScreen.style.display = 'none';
@@ -847,6 +900,7 @@ function createClassButton(timetableName) {
   editButton.innerHTML = '✎';
   editButton.className = 'edit-class-button';
   editButton.title = 'Edit class';
+  editButton.style.display = isAdminMode ? 'block' : 'none'; // Hide by default
 
   container.appendChild(button);
   container.appendChild(editButton);
@@ -866,6 +920,11 @@ function createClassButton(timetableName) {
   const editMenu = updateEditMenu(container, timetableName);
   
   editButton.addEventListener('click', (e) => {
+    if (!isAdminMode) {
+      e.stopPropagation();
+      showNotification('Please enable Admin mode first');
+      return;
+    }
     e.stopPropagation();
     editMenu.classList.toggle('active');
   });
@@ -1069,6 +1128,7 @@ function createClassButton(timetableName) {
   editButton.innerHTML = '✎';
   editButton.className = 'edit-class-button';
   editButton.title = 'Edit class';
+  editButton.style.display = isAdminMode ? 'block' : 'none'; // Hide by default
 
   container.appendChild(button);
   container.appendChild(editButton);
@@ -1088,6 +1148,11 @@ function createClassButton(timetableName) {
   const editMenu = updateEditMenu(container, timetableName);
   
   editButton.addEventListener('click', (e) => {
+    if (!isAdminMode) {
+      e.stopPropagation();
+      showNotification('Please enable Admin mode first');
+      return;
+    }
     e.stopPropagation();
     editMenu.classList.toggle('active');
   });
@@ -1102,3 +1167,154 @@ function createClassButton(timetableName) {
   return container;
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Create and add preferences button
+  const header = document.querySelector('header');
+  const windowControls = document.querySelector('.window-controls');
+  
+  const preferencesButton = document.createElement('button');
+  preferencesButton.className = 'customization-button';  // keep class name for styling
+  preferencesButton.textContent = 'Preferences';
+  
+  header.insertBefore(preferencesButton, windowControls);
+
+  // Create the menu elements
+  const { overlay, menu } = createCustomizationMenu();
+  
+  // Add click handler to show menu
+  preferencesButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    overlay.classList.add('active');
+    menu.classList.add('active');
+  });
+
+  // Add click handler to close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && !preferencesButton.contains(e.target)) {
+      overlay.classList.remove('active');
+      menu.classList.remove('active');
+    }
+  });
+
+  // ...rest of your existing DOMContentLoaded code...
+});
+
+const { ipcRenderer } = require('electron');
+
+function createCustomizationMenu() {
+  const overlay = document.createElement('div');
+  overlay.className = 'customization-overlay';
+  
+  const menu = document.createElement('div');
+  menu.className = 'customization-menu select-window';
+  menu.innerHTML = `
+    <button class="close-select" id="close-preferences">X</button>
+    <h2>Preferences</h2>
+    <button id="select-directory">Select class saving directory</button>
+  `;
+  
+  document.body.appendChild(overlay);
+  document.body.appendChild(menu);
+  
+  const closeMenu = () => {
+    overlay.classList.remove('active');
+    menu.classList.remove('active');
+  };
+  
+  menu.querySelector('.close-select').addEventListener('click', closeMenu);
+  overlay.addEventListener('click', closeMenu);
+  
+  menu.querySelector('#select-directory').addEventListener('click', async () => {
+    try {
+      const result = await ipcRenderer.invoke('select-directory');
+      
+      if (!result.canceled && result.filePaths.length > 0) {
+        const newPath = result.filePaths[0];
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(newPath)) {
+          fs.mkdirSync(newPath, { recursive: true });
+        }
+        
+        // Copy existing files to new location if there are any
+        if (fs.existsSync(CLASSES_DIR)) {
+          const files = fs.readdirSync(CLASSES_DIR);
+          files.forEach(file => {
+            if (file.endsWith('.json')) {
+              const oldPath = path.join(CLASSES_DIR, file);
+              const newFilePath = path.join(newPath, file);
+              fs.copyFileSync(oldPath, newFilePath);
+            }
+          });
+        }
+        
+        // Update path and save settings
+        CLASSES_DIR = newPath;
+        if (saveSettings({ classesDir: newPath })) {
+          showNotification('Directory updated and settings saved!');
+        } else {
+          showNotification('Directory updated but failed to save settings!');
+        }
+        closeMenu();
+      }
+    } catch (error) {
+      console.error('Error selecting directory:', error);
+      showNotification('Error selecting directory!');
+    }
+  });
+  
+  return { overlay, menu };
+}
+
+// Update the customization button click handler in the DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', () => {
+  // ...existing code...
+  
+  const { overlay, menu } = createCustomizationMenu();
+  
+  preferencesButton.addEventListener('click', () => {
+    overlay.classList.add('active');
+    menu.classList.add('active');
+  });
+  
+  // ...existing code...
+});
+
+// Update the DOMContentLoaded event to load settings
+document.addEventListener('DOMContentLoaded', () => {
+  // Load settings first
+  loadSettings();
+  
+  // ...rest of existing DOMContentLoaded code...
+});
+
+// Update timetable references to use the timetable module
+document.addEventListener('DOMContentLoaded', () => {
+  // ...existing calendar initialization...
+
+  // Initialize timetable handlers
+  document.querySelectorAll('.dynamic-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const timeTable = document.querySelector('.time-table');
+      const timeTableTitle = timeTable.querySelector('h2');
+      const timetableName = button.textContent;
+      timeTableTitle.textContent = timetableName;
+      timetable.currentTimetableName = timetableName;
+      timetable.loadTimeTableFromFile(timetableName);
+      timeTable.style.display = 'block';
+      timetable.updateTimetableForWeek(timetable.selectedDate);
+    });
+  });
+
+  // Update calendar cell click handlers
+  const calendarCells = document.querySelectorAll('.dates, .current-date');
+  calendarCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      const day = parseInt(cell.textContent);
+      const selectedDate = new Date(currentYear, currentMonth, day);
+      timetable.updateTimetableForWeek(selectedDate);
+    });
+  });
+});
+
+// ...rest of existing calendar code...

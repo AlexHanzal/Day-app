@@ -1,23 +1,39 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
 
-app.on('ready', () => {
+function createWindow() {
     mainWindow = new BrowserWindow({
         fullscreen: true,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false,
-            preload: path.join(__dirname, 'renderer.js')
+            contextIsolation: false
         }
     });
 
     mainWindow.loadFile('index.html');
+}
+
+app.whenReady().then(createWindow);
+
+// Handle directory selection
+ipcMain.handle('select-directory', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory'],
+        title: 'Select Directory for Class Data Files'
+    });
+    return result;
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
 });

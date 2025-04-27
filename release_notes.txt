@@ -1,3 +1,6 @@
-- Added class edit functionality (name change and deletion)
-- Made permanent hours saving system more compact
-- Moved calendar styles into separate .css file
+- Added customization menu
+    - Class data saving directory selection
+        - Persistent directory selection across app restarts
+- Updated data saving to better accomodate changes
+- Added admin mode
+- 
