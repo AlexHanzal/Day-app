@@ -404,6 +404,12 @@ document.getElementById('confirm-verification').addEventListener('click', () => 
       return;
     }
 
+    // Show clear data button in admin mode
+    const clearDataButton = document.querySelector('.clear-data-button');
+    if (clearDataButton) {
+      clearDataButton.style.display = 'block';
+    }
+
     // Simple table editing with focus management
     const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
     tableCells.forEach(cell => {
@@ -435,6 +441,90 @@ document.getElementById('confirm-verification').addEventListener('click', () => 
   } else {
     showNotification('Invalid code. Please try again.');
   }
+});
+
+// Add clear data button event listener
+document.querySelector('.clear-data-button').addEventListener('click', () => {
+  if (!currentTimetableName) {
+    showNotification('Please select a timetable first');
+    return;
+  }
+
+  // First confirmation dialog
+  const firstDialog = document.createElement('div');
+  firstDialog.className = 'verification-window';
+  firstDialog.style.display = 'flex';
+  firstDialog.innerHTML = `
+    <div class="verification-content">
+      <h3>Clear Data</h3>
+      <p>Are you sure you want to clear all data from "${currentTimetableName}"?</p>
+      <div class="verification-buttons">
+        <button id="first-confirm-clear">Yes</button>
+        <button id="first-cancel-clear">No</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(firstDialog);
+
+  firstDialog.querySelector('#first-confirm-clear').addEventListener('click', () => {
+    firstDialog.remove();
+    
+    // Second confirmation dialog
+    const secondDialog = document.createElement('div');
+    secondDialog.className = 'verification-window';
+    secondDialog.style.display = 'flex';
+    secondDialog.innerHTML = `
+      <div class="verification-content">
+        <h3>Final Confirmation</h3>
+        <p>Are you absolutely sure? This cannot be undone!</p>
+        <div class="verification-buttons">
+          <button id="final-confirm-clear">Yes, Clear Data</button>
+          <button id="final-cancel-clear">No, Keep Data</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(secondDialog);
+
+    secondDialog.querySelector('#final-confirm-clear').addEventListener('click', () => {
+      const filePath = path.join(CLASSES_DIR, `${currentTimetableName}.timtbl`);
+      try {
+        // Clear the data
+        const emptyData = { permanentHours: {} };
+        fs.writeFileSync(filePath, JSON.stringify(emptyData, null, 2));
+        showNotification('Timetable data cleared successfully!');
+
+        // Reset the data in memory
+        timetableData[currentTimetableName] = emptyData;
+        
+        // Refresh the timetable display
+        updateTimetableForWeek(selectedDate);
+
+        // Exit admin mode
+        const tableCells = document.querySelectorAll('.week-table td:not(:first-child)');
+        tableCells.forEach(cell => {
+          cell.contentEditable = 'false';
+          cell.style.backgroundColor = '';
+        });
+        document.querySelector('.clear-data-button').style.display = 'none';
+        showNotification('Exited admin mode');
+
+      } catch (error) {
+        console.error('Error clearing timetable data:', error);
+        showNotification('Error clearing timetable data!');
+      }
+      secondDialog.remove();
+    });
+
+    secondDialog.querySelector('#final-cancel-clear').addEventListener('click', () => {
+      secondDialog.remove();
+    });
+  });
+
+  firstDialog.querySelector('#first-cancel-clear').addEventListener('click', () => {
+    firstDialog.remove();
+  });
 });
 
 // Add new function for timetable-specific permanent hours
@@ -1116,35 +1206,25 @@ function createClassButton(timetableName) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Create and add preferences button
-  const header = document.querySelector('header');
-  const windowControls = document.querySelector('.window-controls');
-  
-  const customizationButton = document.createElement('button');
-  customizationButton.className = 'customization-button';
-  customizationButton.textContent = 'Preferences';
-  
-  header.insertBefore(customizationButton, windowControls);
-
   // Create the menu elements
   const { overlay, menu } = createCustomizationMenu();
   
-  // Add click handler to show menu
-  customizationButton.addEventListener('click', (e) => {
+  // Update click handler for sidebar preferences button
+  document.querySelector('.sidebar-bottom .customization-button').addEventListener('click', (e) => {
     e.stopPropagation();
     overlay.classList.add('active');
     menu.classList.add('active');
   });
-
+  
   // Add click handler to close menu when clicking outside
   document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && !customizationButton.contains(e.target)) {
+    if (!menu.contains(e.target)) {
       overlay.classList.remove('active');
       menu.classList.remove('active');
     }
   });
-
-  // ...rest of your existing DOMContentLoaded code...
+  
+  // ...existing code...
 });
 
 function createCustomizationMenu() {
@@ -1188,52 +1268,24 @@ function createCustomizationMenu() {
       
       if (!result.canceled && result.filePaths.length > 0) {
         const newPath = result.filePaths[0];
+        CLASSES_DIR = newPath;
+        
+        // Update the displayed path immediately
+        const dirPath = menu.querySelector('.directory-path');
+        dirPath.textContent = newPath;
+        
+        // Save the new path to settings
+        fs.writeFileSync(
+          path.join(__dirname, 'settings.json'), 
+          JSON.stringify({ classesDir: newPath }, null, 2)
+        );
         
         // Create directory if it doesn't exist
         if (!fs.existsSync(newPath)) {
           fs.mkdirSync(newPath, { recursive: true });
         }
-
-        // Save the new path to settings first
-        fs.writeFileSync(
-          path.join(__dirname, 'settings.json'), 
-          JSON.stringify({ classesDir: newPath }, null, 2)
-        );
-
-        // Update the global path
-        CLASSES_DIR = newPath;
         
-        // Update the displayed path
-        const dirPath = menu.querySelector('.directory-path');
-        dirPath.textContent = newPath;
-
-        // Clear existing timetables
-        const container = document.getElementById('dynamic-links-container');
-        container.innerHTML = '';
-        timetableData = {};
-        currentTimetableName = null;
-
-        // Hide current timetable if shown
-        const timeTable = document.querySelector('.time-table');
-        if (timeTable) {
-          timeTable.style.display = 'none';
-        }
-        
-        // Load timetables from new directory
-        try {
-          const files = fs.readdirSync(newPath);
-          files.forEach(file => {
-            if (file.endsWith('.timtbl')) {
-              const timetableName = path.basename(file, '.timtbl');
-              const button = createClassButton(timetableName);
-              container.appendChild(button);
-            }
-          });
-        } catch (error) {
-          console.error('Error loading timetables from new directory:', error);
-        }
-        
-        showNotification('Directory changed successfully!');
+        showNotification('Directory updated successfully!');
       }
     } catch (error) {
       console.error('Directory selection error:', error);
@@ -1247,14 +1299,23 @@ function createCustomizationMenu() {
 // Update the customization button click handler in the DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
   // ...existing code...
+  const windowControls = document.querySelector('.window-controls');
+  
+  // Remove old preferences button creation code
   
   const { overlay, menu } = createCustomizationMenu();
   
-  customizationButton.addEventListener('click', () => {
+  // Update click handler for new preferences button location
+  document.querySelector('.customization-button').addEventListener('click', (e) => {
+    e.stopPropagation();
     overlay.classList.add('active');
     menu.classList.add('active');
   });
-  
   // ...existing code...
+});
+
+// Add close button functionality to verification window
+document.getElementById('close-verification').addEventListener('click', () => {
+  document.getElementById('verification-window').style.display = 'none';
 });
 

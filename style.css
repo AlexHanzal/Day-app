@@ -412,7 +412,7 @@ button:hover {
 .edit-button,
 .operator-button {
   padding: 10px 20px; /* Reduced from 10px 20px */
-  font-size: 1em; 
+  font-size: 1em; /* Make button text 10% smaller */
   background-color: var(--primary-color);
   color: var (--secondary-color);
   border: 2px solid var(--primary-color);
@@ -446,24 +446,23 @@ button:hover {
 }
 
 .operator-button {
-  position: absolute;
-  right: 380px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 8px 16px;
-  background-color: var(--primary-color) !important;
-  color: var(--third-color) !important;
+  position: static;
+  padding: 12px 24px;  /* Increased padding */
+  background-color: var(--primary-color);
+  color: var(--third-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 0.5em;
+  font-size: 1.2em;  /* Increased font size */
   transition: all 0.2s ease;
+  width: 100%;
+  max-width: 180px;  /* Increased max-width */
 }
 
 .operator-button:hover {
-  background-color: var(--secondary-color) !important;
-  color: var(--primary-color) !important;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
@@ -837,24 +836,25 @@ button:hover {
 }
 
 .customization-button {
-  position: absolute;
-  right: 150px; /* Increased from 100px to make room for Admin button */
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 8px 16px;
+  position: static;
+  padding: 12px 24px;
   background-color: var(--primary-color);
-  color: var(--secondary-color);
+  color: var(--third-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 1.2em;
   transition: all 0.2s ease;
+  width: 100%;
+  max-width: 180px;
+  margin-bottom: 10px;
 }
 
 .customization-button:hover {
   background-color: var(--secondary-color);
   color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .customization-menu {
@@ -868,9 +868,7 @@ button:hover {
   border-radius: 10px;
   padding: 20px;
   z-index: 3000;
-  width: 400px; /* Set fixed width */
-  max-width: 90%; /* Prevent overflow on small screens */
-  position: relative; /* Ensure proper positioning context */
+  min-width: 300px;
 }
 
 .customization-menu h2 {
@@ -907,35 +905,6 @@ button:hover {
   width: auto;
 }
 
-.customization-menu .menu-header {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.customization-menu .close-button {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 25px;
-  height: 25px;
-  padding: 0;
-  border: 2px solid var(--primary-color);
-  border-radius: 50%;
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  font-size: 16px;
-  line-height: 21px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.customization-menu .close-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-}
-
 .customization-overlay {
   display: none;
   position: fixed;
@@ -951,21 +920,25 @@ button:hover {
   display: block;
 }
 
-.customization-menu .current-directory {
-  margin: 15px 0;
-}
-
-.customization-menu .directory-path {
-  word-break: break-all; /* Allow long paths to wrap */
-  background-color: var(--third-color);
-  padding: 10px;
-  border-radius: 5px;
-  margin: 5px 0;
-}
-
 .admin-controls {
   margin-top: 10px;
   text-align: center;
+}
+
+.clear-data-button {
+  padding: 10px 20px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  display: none;
+}
+
+.clear-data-button:hover {
+  background-color: #cc0000;
 }
 
 .clear-data-button {
@@ -983,4 +956,17 @@ button:hover {
 .clear-data-button:hover {
   background-color: #cc0000;
   border-color: #cc0000;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0 15px;
+  box-sizing: border-box;
 }

@@ -1,0 +1,2 @@
+- Added timetable reset into admin mode
+- Added automatic admin logout after making changes
