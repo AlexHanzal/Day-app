@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ipcRenderer } = require('electron');
+const translations = require('./translations.js');
 
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
@@ -47,12 +48,8 @@ function updateCalendar(month, year, calendarId, titleId) {
   const calendarElement = document.getElementById(calendarId);
   const calendarTitle = document.getElementById(titleId);
 
-  // Update the calendar title
-  const monthNames = [
-    'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen',
-    'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'
-  ];
-  calendarTitle.textContent = `${monthNames[month]} ${year}`;
+  // Update the calendar title using translations
+  calendarTitle.textContent = `${translations[currentLanguage].months[month]} ${year}`;
 
   // Clear the existing calendar
   calendarElement.innerHTML = '';
@@ -67,7 +64,7 @@ function updateCalendar(month, year, calendarId, titleId) {
   const tableBody = document.createElement('tbody');
 
   // Add the weekday headers (starting from Monday)
-  const weekdays = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+  const weekdays = translations[currentLanguage].weekdays;
   const headerRow = document.createElement('tr');
   weekdays.forEach(weekday => {
     const headerCell = document.createElement('th');
@@ -399,6 +396,11 @@ document.getElementById('confirm-verification').addEventListener('click', () => 
     const verificationWindow = document.getElementById('verification-window');
     verificationWindow.style.display = 'none';
 
+    // Show edit buttons when in admin mode
+    document.querySelectorAll('.edit-class-button').forEach(button => {
+      button.style.visibility = 'visible';
+    });
+
     if (!currentTimetableName) {
       showNotification('Please select a timetable first');
       return;
@@ -437,6 +439,15 @@ document.getElementById('confirm-verification').addEventListener('click', () => 
       cell.addEventListener('click', function() {
         this.focus();
       });
+    });
+
+    // Add handler to hide edit buttons when exiting admin mode
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.save-button')) {
+        document.querySelectorAll('.edit-class-button').forEach(button => {
+          button.style.visibility = 'hidden';
+        });
+      }
     });
   } else {
     showNotification('Invalid code. Please try again.');
@@ -1245,6 +1256,8 @@ function createCustomizationMenu() {
       <p class="directory-path">${CLASSES_DIR}</p>
     </div>
     <button id="select-directory">Select new directory</button>
+    <button id="select-language">Language</button>
+    <button id="select-appearance">Appearance</button>
   `;
   
   document.body.appendChild(overlay);
@@ -1292,7 +1305,26 @@ function createCustomizationMenu() {
       showNotification('Error selecting directory: ' + error.message);
     }
   });
-  
+
+  menu.querySelector('#select-language').addEventListener('click', () => {
+    const langWindow = document.getElementById('language-window');
+    langWindow.style.display = 'block';
+    overlay.classList.remove('active');
+    menu.classList.remove('active');
+  });
+
+  menu.querySelector('#select-appearance').addEventListener('click', () => {
+    const appearanceWindow = document.getElementById('appearance-window');
+    appearanceWindow.style.display = 'block';
+    overlay.classList.remove('active');
+    menu.classList.remove('active');
+  });
+
+  // Add close button handler for appearance window
+  document.getElementById('close-appearance').addEventListener('click', () => {
+    document.getElementById('appearance-window').style.display = 'none';
+  });
+
   return { overlay, menu };
 }
 
@@ -1317,5 +1349,128 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add close button functionality to verification window
 document.getElementById('close-verification').addEventListener('click', () => {
   document.getElementById('verification-window').style.display = 'none';
+});
+
+document.getElementById('close-language').addEventListener('click', () => {
+  document.getElementById('language-window').style.display = 'none';
+});
+
+document.getElementById('lang-cs').addEventListener('click', () => {
+  // Handle Czech language selection
+  document.getElementById('language-window').style.display = 'none';
+});
+
+document.getElementById('lang-en').addEventListener('click', () => {
+  // Handle English language selection
+  document.getElementById('language-window').style.display = 'none';
+});
+
+let currentLanguage = 'cs'; // Default language
+
+function updateLanguage(lang) {
+  currentLanguage = lang;
+  
+  // Update all UI elements
+  document.title = translations[lang].title;
+  document.querySelector('.title').textContent = translations[lang].title;
+  document.querySelector('.customization-button').textContent = translations[lang].preferences;
+  document.querySelector('.operator-button').textContent = translations[lang].admin;
+  document.querySelector('#select-directory').textContent = translations[lang].selectNewDir;
+  document.querySelector('.current-directory p').textContent = translations[lang].currentDir;
+  document.querySelector('#select-language').textContent = translations[lang].language;
+  
+  // Update labels and placeholders
+  document.querySelector('label[for="name-input"]').textContent = translations[lang].name;
+  document.querySelector('#name-input').placeholder = translations[lang].enterName;
+  document.querySelector('label[for="type-select"]').textContent = translations[lang].type;
+  document.querySelector('#type-select option[value="thing"]').textContent = translations[lang].thing;
+  document.querySelector('#type-select option[value="class"]').textContent = translations[lang].class;
+  document.querySelector('#submit-button').textContent = translations[lang].confirm;
+  
+  // Update buttons
+  document.querySelector('.edit-button').textContent = translations[lang].edit;
+  document.querySelector('.save-button').textContent = translations[lang].save;
+  document.querySelector('.clear-data-button').textContent = translations[lang].clearData;
+  
+  // Update verification window
+  document.querySelector('.verification-content h2').textContent = translations[lang].verification;
+  document.querySelector('.verification-content p').textContent = translations[lang].enterCode;
+  document.querySelector('#close-verification').textContent = translations[lang].close;
+  document.querySelector('#confirm-verification').textContent = translations[lang].confirm;
+  
+  // Update table headers
+  document.querySelector('.week-table thead th:first-child').textContent = translations[lang].day;
+  
+  // Save language preference
+  localStorage.setItem('preferredLanguage', lang);
+  
+  // Update weekdays in timetable
+  const dayRows = document.querySelectorAll('.week-table tbody tr');
+  const days = [
+    translations[lang].monday,
+    translations[lang].tuesday,
+    translations[lang].wednesday,
+    translations[lang].thursday,
+    translations[lang].friday
+  ];
+  
+  dayRows.forEach((row, index) => {
+    const firstCell = row.querySelector('td:first-child');
+    const dayText = firstCell.textContent;
+    // Preserve the date part if it exists
+    const dateMatch = dayText.match(/\(.*\)/);
+    const dateText = dateMatch ? ' ' + dateMatch[0] : '';
+    firstCell.textContent = days[index] + dateText;
+  });
+
+  // Update Jazyk button
+  document.querySelector('#select-language').textContent = translations[lang].language;
+  
+  document.getElementById('language-window').style.display = 'none';
+
+  // Update calendar when language changes
+  updateCalendar(currentMonth, currentYear, 'timetable-calendar', 'timetable-calendar-title');
+}
+
+// Update language button handlers
+document.getElementById('lang-cs').addEventListener('click', () => {
+  updateLanguage('cs');
+});
+
+document.getElementById('lang-en').addEventListener('click', () => {
+  updateLanguage('en');
+});
+
+// Load saved language preference on startup
+document.addEventListener('DOMContentLoaded', () => {
+  const savedLang = localStorage.getItem('preferredLanguage');
+  if (savedLang) {
+    updateLanguage(savedLang);
+  }
+  // ...rest of existing DOMContentLoaded code...
+});
+
+// Add theme handling functions
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+}
+
+// Add theme button handlers
+document.getElementById('theme-light').addEventListener('click', () => {
+  setTheme('light');
+  document.getElementById('appearance-window').style.display = 'none';
+});
+
+document.getElementById('theme-dark').addEventListener('click', () => {
+  setTheme('dark');
+  document.getElementById('appearance-window').style.display = 'none';
+});
+
+// Load saved theme preference on startup
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+  // ...rest of existing DOMContentLoaded code...
 });
 

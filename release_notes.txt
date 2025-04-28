@@ -1,2 +1,2 @@
-- Added timetable reset into admin mode
-- Added automatic admin logout after making changes
+-Added new language
+-Added new color way

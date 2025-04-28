@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zaber si</title>
+  <title>Rozvrh hodin</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="calendar_style.css">
 </head>
 <body>
   <header class="header" id="header">
-    <h1 class="title">Zaber si</h1>
+    <h1 class="title">Rozvrh hodin</h1>
     <div class="window-controls">
       <button id="fullscreen-toggle">□</button>
       <button id="close-app">✕</button>
@@ -21,7 +21,7 @@
       <li><button class="create-new" id="create-new">+</button></li>
     </ul>
     <div class="sidebar-bottom">
-      <button class="customization-button">Preferences</button>
+      <button class="customization-button">Nastavení</button>
       <button class="operator-button">Admin</button>
     </div>
   </aside>
@@ -29,28 +29,28 @@
     <div class="select-window">
       <button class="close-select" id="close-select">X</button>
       <div class="input-group">
-        <label for="name-input">Name:</label>
-        <input type="text" id="name-input" placeholder="Enter name">
+        <label for="name-input">Název:</label>
+        <input type="text" id="name-input" placeholder="Zadejte název">
       </div>
       <div class="input-group">
-        <label for="type-select">Type:</label>
+        <label for="type-select">Typ:</label>
         <select id="type-select">
-          <option value="thing">Thing</option>
-          <option value="class">Class</option>
+          <option value="thing">Věc</option>
+          <option value="class">Třída</option>
         </select>
       </div>
-      <button class="submit-button" id="submit-button">Submit</button>
+      <button class="submit-button" id="submit-button">Potvrdit</button>
     </div>
   </div>
   
   <div class="time-table">
-    <h2>Time Table</h2>
+    <h2>Rozvrh hodin</h2>
     <div class="timetable-content">
       <div class="table-container">
         <table class="week-table">
           <thead>
             <tr>
-              <th>Day</th>
+              <th>Den</th>
               <th>1</th>
               <th>2</th>
               <th>3</th>
@@ -94,12 +94,12 @@
       </div>
       <div class="bottom-content">
         <div class="time-table-buttons">
-          <button class="edit-button">Edit</button>
-          <button class="save-button">Save</button>
+          <button class="edit-button">Upravit</button>
+          <button class="save-button">Uložit</button>
         </div>
-        <button class="clear-data-button">Clear All Data</button>
+        <button class="clear-data-button">Vymazat vše</button>
         <div class="admin-controls" style="display: none;">
-          <button class="clear-data-button">Clear All Data</button>
+          <button class="clear-data-button">Vymazat vše</button>
         </div>
         <div class="timetable-calendar">
           <div class="calendar-header">
@@ -125,12 +125,32 @@
   </div>
   <div class="verification-window" id="verification-window">
     <div class="verification-content">
-      <h2>Verification</h2>
-      <p>Please enter the code:</p>
-      <input type="password" id="verification-code" placeholder="Enter code">
+      <h2>Ověření</h2>
+      <p>Zadejte prosím kód:</p>
+      <input type="password" id="verification-code" placeholder="Zadejte kód">
       <div class="verification-buttons">
-        <button class="close-verification" id="close-verification">Close</button>
-        <button class="confirm-verification" id="confirm-verification">Confirm</button>
+        <button class="close-verification" id="close-verification">Zavřít</button>
+        <button class="confirm-verification" id="confirm-verification">Potvrdit</button>
+      </div>
+    </div>
+  </div>
+  <div class="language-window" id="language-window">
+    <div class="language-content">
+      <button class="close-button" id="close-language">✕</button>
+      <h2>Select Language</h2>
+      <div class="language-buttons">
+        <button id="lang-cs">Čeština</button>
+        <button id="lang-en">English</button>
+      </div>
+    </div>
+  </div>
+  <div class="appearance-window" id="appearance-window">
+    <div class="appearance-content">
+      <button class="close-button" id="close-appearance">✕</button>
+      <h2>Select Theme</h2>
+      <div class="appearance-buttons">
+        <button id="theme-light">Light</button>
+        <button id="theme-dark">Dark</button>
       </div>
     </div>
   </div>
