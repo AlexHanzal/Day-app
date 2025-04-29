@@ -1,17 +1,13 @@
 {
-  "name": "day-app",
-  "version": "6.5.0",
-  "description": "School class hours reservation application",
-  "license": "ISC",
-  "author": "Alex Hanzal, Štěpán Kádár",
-  "type": "commonjs",
-  "main": "main.js",
+  "name": "school-app",
+  "version": "1.0.0",
+  "description": "School Timetable Application",
   "scripts": {
-    "start": "electron ."
+    "start": "http-server ./ -p 8080 --cors -c-1",
+    "dev": "nodemon --watch src --exec 'npm start'"
   },
-  "keywords": [],
   "devDependencies": {
-    "electron": "^35.1.5"
-  },
-  "json.validate.enable": false
+    "http-server": "^14.1.1",
+    "nodemon": "^2.0.22"
+  }
 }

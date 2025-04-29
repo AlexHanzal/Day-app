@@ -1,8 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const { ipcRenderer } = require('electron');
-const translations = require('./translations.js');
-
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let selectedDate = new Date(); // Add this to track selected date
@@ -10,11 +5,11 @@ let timetableData = {};
 let currentTimetableName = null;
 
 // Make CLASSES_DIR variable modifiable
-let CLASSES_DIR = path.join(__dirname, 'classes');
+let CLASSES_DIR = 'classes';
 
 // Load saved directory path on startup
 try {
-  const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json')));
+  const settings = JSON.parse(localStorage.getItem('settings'));
   if (settings.classesDir) {
     CLASSES_DIR = settings.classesDir;
   }
@@ -24,8 +19,8 @@ try {
 }
 
 // Create classes directory if it doesn't exist
-if (!fs.existsSync(CLASSES_DIR)) {
-  fs.mkdirSync(CLASSES_DIR, { recursive: true });
+if (!localStorage.getItem(CLASSES_DIR)) {
+  localStorage.setItem(CLASSES_DIR, JSON.stringify({}));
 }
 
 function showNotification(message) {
@@ -499,11 +494,10 @@ document.querySelector('.clear-data-button').addEventListener('click', () => {
     document.body.appendChild(secondDialog);
 
     secondDialog.querySelector('#final-confirm-clear').addEventListener('click', () => {
-      const filePath = path.join(CLASSES_DIR, `${currentTimetableName}.timtbl`);
       try {
         // Clear the data
         const emptyData = { permanentHours: {} };
-        fs.writeFileSync(filePath, JSON.stringify(emptyData, null, 2));
+        localStorage.setItem(currentTimetableName, JSON.stringify(emptyData));
         showNotification('Timetable data cleared successfully!');
 
         // Reset the data in memory
@@ -559,7 +553,7 @@ function saveToAllWeeksForCurrentTimetable(dayIndex, colIndex, content) {
   
   timetableData[currentTimetableName].permanentHours[dayKey][colIndex] = content;
   
-  // Save changes to file
+  // Save changes to localStorage
   saveTimeTableToFile(currentTimetableName);
 }
 
@@ -773,10 +767,9 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 function saveTimeTableToFile(timetableName) {
-  const filePath = path.join(CLASSES_DIR, `${timetableName}.timtbl`);
   try {
     const data = timetableData[timetableName] || {};
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    localStorage.setItem(timetableName, JSON.stringify(data));
     showNotification('Timetable saved successfully!');
   } catch (error) {
     console.error('Error saving timetable:', error);
@@ -785,10 +778,9 @@ function saveTimeTableToFile(timetableName) {
 }
 
 function loadTimeTableFromFile(timetableName) {
-  const filePath = path.join(CLASSES_DIR, `${timetableName}.timtbl`);
   try {
-    if (fs.existsSync(filePath)) {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const data = JSON.parse(localStorage.getItem(timetableName));
+    if (data) {
       timetableData[timetableName] = data;
       return true;
     }
@@ -849,7 +841,7 @@ function handleSave() {
     });
   });
 
-  // Save to JSON file
+  // Save to localStorage
   saveTimeTableToFile(currentTimetableName);
 }
 
@@ -859,10 +851,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load existing timetables
   try {
-    const files = fs.readdirSync(CLASSES_DIR);
-    files.forEach(file => {
-      if (file.endsWith('.timtbl')) {
-        const timetableName = path.basename(file, '.timtbl');
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.endsWith('.timtbl')) {
+        const timetableName = key.replace('.timtbl', '');
         const button = createClassButton(timetableName);
         document.getElementById('dynamic-links-container').appendChild(button);
       }
@@ -903,18 +895,15 @@ function updateEditMenu(container, className) {
 }
 
 function renameClass(oldName, newName, container) {
-  const oldPath = path.join(CLASSES_DIR, `${oldName}.timtbl`);
-  const newPath = path.join(CLASSES_DIR, `${newName}.timtbl`);
-
   try {
     // Read existing data
-    const data = JSON.parse(fs.readFileSync(oldPath, 'utf8'));
+    const data = JSON.parse(localStorage.getItem(oldName));
     
-    // Write to new file
-    fs.writeFileSync(newPath, JSON.stringify(data, null, 2));
+    // Write to new key
+    localStorage.setItem(newName, JSON.stringify(data));
     
-    // Delete old file
-    fs.unlinkSync(oldPath);
+    // Delete old key
+    localStorage.removeItem(oldName);
     
     // Update data structures
     timetableData[newName] = timetableData[oldName];
@@ -1092,12 +1081,9 @@ function showFinalDeleteConfirmation(timetableName, container) {
 }
 
 function deleteClass(timetableName, container) {
-  const filePath = path.join(CLASSES_DIR, `${timetableName}.timtbl`);
   try {
-    // Delete the JSON file
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    // Delete the localStorage key
+    localStorage.removeItem(timetableName);
     
     // Remove from data structure
     delete timetableData[timetableName];
@@ -1124,18 +1110,15 @@ function deleteClass(timetableName, container) {
 }
 
 function renameClass(oldName, newName, container) {
-  const oldPath = path.join(CLASSES_DIR, `${oldName}.timtbl`);
-  const newPath = path.join(CLASSES_DIR, `${newName}.timtbl`);
-
   try {
     // Read existing data
-    const data = JSON.parse(fs.readFileSync(oldPath, 'utf8'));
+    const data = JSON.parse(localStorage.getItem(oldName));
     
-    // Write to new file
-    fs.writeFileSync(newPath, JSON.stringify(data, null, 2));
+    // Write to new key
+    localStorage.setItem(newName, JSON.stringify(data));
     
-    // Delete old file
-    fs.unlinkSync(oldPath);
+    // Delete old key
+    localStorage.removeItem(oldName);
     
     // Update data structures
     timetableData[newName] = timetableData[oldName];
@@ -1277,10 +1260,10 @@ function createCustomizationMenu() {
   
   menu.querySelector('#select-directory').addEventListener('click', async () => {
     try {
-      const result = await ipcRenderer.invoke('select-directory');
+      const result = await window.showDirectoryPicker();
       
-      if (!result.canceled && result.filePaths.length > 0) {
-        const newPath = result.filePaths[0];
+      if (result) {
+        const newPath = result.name;
         CLASSES_DIR = newPath;
         
         // Update the displayed path immediately
@@ -1288,14 +1271,11 @@ function createCustomizationMenu() {
         dirPath.textContent = newPath;
         
         // Save the new path to settings
-        fs.writeFileSync(
-          path.join(__dirname, 'settings.json'), 
-          JSON.stringify({ classesDir: newPath }, null, 2)
-        );
+        localStorage.setItem('settings', JSON.stringify({ classesDir: newPath }));
         
         // Create directory if it doesn't exist
-        if (!fs.existsSync(newPath)) {
-          fs.mkdirSync(newPath, { recursive: true });
+        if (!localStorage.getItem(newPath)) {
+          localStorage.setItem(newPath, JSON.stringify({}));
         }
         
         showNotification('Directory updated successfully!');
@@ -1472,5 +1452,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('theme') || 'dark';
   setTheme(savedTheme);
   // ...rest of existing DOMContentLoaded code...
+});
+
+// Initialize your web application
+document.addEventListener('DOMContentLoaded', () => {
+    // Your browser-compatible code here
+    console.log('Application started');
 });
 
