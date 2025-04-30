@@ -782,10 +782,36 @@ document.addEventListener('fullscreenchange', () => {
   button.textContent = document.fullscreenElement ? '□' : '❐';
 });
 
-function saveTimeTableToFile(timetableName) {
+let classesHandle = null; // Store directory handle
+
+async function getClassesDirectory() {
   try {
-    const data = timetableData[timetableName] || {};
-    localStorage.setItem(timetableName, JSON.stringify(data));
+    // Always request new directory to force loading
+    const handle = await window.showDirectoryPicker({
+      mode: 'readwrite',
+      startIn: 'documents',
+    });
+    
+    // Save the directory path
+    localStorage.setItem('directoryHandle', handle.name);
+    return handle;
+    
+  } catch (error) {
+    console.error('Error getting directory access:', error);
+    showNotification('Please grant access to a folder for saving classes');
+    return null;
+  }
+}
+
+async function saveTimeTableToFile(timetableName) {
+  try {
+    const dirHandle = await getClassesDirectory();
+    if (!dirHandle) return;
+
+    const fileHandle = await dirHandle.getFileHandle(`${timetableName}.json`, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(JSON.stringify(timetableData[timetableName] || {}, null, 2));
+    await writable.close();
     showNotification('Timetable saved successfully!');
   } catch (error) {
     console.error('Error saving timetable:', error);
@@ -793,29 +819,24 @@ function saveTimeTableToFile(timetableName) {
   }
 }
 
-function loadTimeTableFromFile(timetableName) {
+async function loadTimeTableFromFile(timetableName) {
   try {
-    // First try to load from localStorage
-    let data = JSON.parse(localStorage.getItem(timetableName));
-    
-    // If not in localStorage, try to load from classes directory
-    if (!data) {
-      const classData = JSON.parse(localStorage.getItem(`classes/${timetableName}.json`));
-      if (classData) {
-        data = classData;
-        // Save to localStorage for future use
-        localStorage.setItem(timetableName, JSON.stringify(data));
-      }
-    }
+    const dirHandle = await getClassesDirectory();
+    if (!dirHandle) return false;
 
-    // Initialize if no data found
-    if (!data) {
-      data = { permanentHours: {} };
+    try {
+      const fileHandle = await dirHandle.getFileHandle(`${timetableName}.json`);
+      const file = await fileHandle.getFile();
+      const content = await file.text();
+      const data = JSON.parse(content);
+      timetableData[timetableName] = data;
+      updateTimetableForWeek(selectedDate);
+      return true;
+    } catch (error) {
+      // Initialize new timetable if file doesn't exist
+      timetableData[timetableName] = { permanentHours: {} };
+      return false;
     }
-
-    timetableData[timetableName] = data;
-    updateTimetableForWeek(selectedDate);
-    return true;
   } catch (error) {
     console.error('Error loading timetable:', error);
     showNotification('Error loading timetable!');
@@ -823,89 +844,98 @@ function loadTimeTableFromFile(timetableName) {
   }
 }
 
-// Replace the handleSave function
-function handleSave() {
-  if (!currentTimetableName) {
-    showNotification('Please select a timetable first');
-    return;
-  }
-
-  const dayRows = document.querySelectorAll('.week-table tbody tr');
-  dayRows.forEach((row, index) => {
-    const currentDate = new Date(selectedDate);
-    const dayOfWeek = selectedDate.getDay();
-    const monday = new Date(selectedDate);
-    monday.setDate(selectedDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-    currentDate.setDate(monday.getDate() + index);
-
-    const cells = row.querySelectorAll('td:not(:first-child)');
-    cells.forEach((cell, colIndex) => {
-      if (cell.textContent.trim()) {
-        saveCellContent(currentDate, colIndex, cell.textContent);
-      }
-      
-      const newCell = cell.cloneNode(true);
-      newCell.contentEditable = 'false';
-      newCell.style.backgroundColor = '';
-      if (cell.classList.contains('permanent-hour')) {
-        newCell.classList.add('permanent-hour');
-      }
-      cell.parentNode.replaceChild(newCell, cell);
-    });
-  });
-
-  // Save to localStorage
-  saveTimeTableToFile(currentTimetableName);
-}
-
-// Add initialization code to load existing timetables
-document.addEventListener('DOMContentLoaded', () => {
-  // ...existing DOMContentLoaded code...
-
-  // Load existing timetables
-  try {
-    const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.endsWith('.timtbl')) {
-        const timetableName = key.replace('.timtbl', '');
-        const button = createClassButton(timetableName);
-        document.getElementById('dynamic-links-container').appendChild(button);
-      }
-    });
-  } catch (error) {
-    console.error('Error loading timetables:', error);
-  }
+// Update the DOM loaded event to load existing timetables
+document.addEventListener('DOMContentLoaded', async () => {
+  await initializeClasses();
+  // Clear existing buttons
+  const container = document.getElementById('dynamic-links-container');
+  container.innerHTML = '';
   
-  // Load all timetables from localStorage
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key.startsWith('settings') && !key.startsWith('preferred')) {
-      try {
-        const data = JSON.parse(localStorage.getItem(key));
-        timetableData[key] = data;
-        const button = createClassButton(key);
-        document.getElementById('dynamic-links-container').appendChild(button);
-      } catch (error) {
-        console.error('Error loading timetable:', error);
+  // Load classes from the selected directory
+  try {
+    const dirHandle = await getClassesDirectory();
+    if (dirHandle) {
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+          const timetableName = entry.name.replace('.json', '');
+          try {
+            const fileHandle = await dirHandle.getFileHandle(entry.name);
+            const file = await fileHandle.getFile();
+            const content = await file.text();
+            timetableData[timetableName] = JSON.parse(content);
+            
+            const button = createClassButton(timetableName);
+            container.appendChild(button);
+          } catch (error) {
+            console.error(`Error loading file ${entry.name}:`, error);
+          }
+        }
       }
     }
-  }
-
-  // Load classes from the classes directory
-  try {
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('classes/') && key.endsWith('.json')) {
-        const timetableName = key.replace('classes/', '').replace('.json', '');
-        const button = createClassButton(timetableName);
-        document.getElementById('dynamic-links-container').appendChild(button);
-      }
-    });
   } catch (error) {
     console.error('Error loading classes:', error);
+    showNotification('Error loading classes!');
   }
-  
+
   // ...rest of existing DOMContentLoaded code...
 });
+
+// Update deleteClass function to use File System Access API
+async function deleteClass(timetableName, container) {
+  try {
+    const dirHandle = await getClassesDirectory();
+    if (!dirHandle) return;
+
+    await dirHandle.removeEntry(`${timetableName}.json`);
+    delete timetableData[timetableName];
+    container.remove();
+    
+    if (currentTimetableName === timetableName) {
+      currentTimetableName = null;
+      const timeTable = document.querySelector('.time-table');
+      timeTable.style.display = 'none';
+      const timeTableTitle = timeTable.querySelector('h2');
+      if (timeTableTitle) timeTableTitle.textContent = '';
+    }
+    
+    showNotification('Class deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting class:', error);
+    showNotification('Error deleting class!');
+  }
+}
+
+// Update renameClass function to use File System Access API
+async function renameClass(oldName, newName, container) {
+  try {
+    const dirHandle = await getClassesDirectory();
+    if (!dirHandle) return;
+
+    // Read old file
+    const oldFileHandle = await dirHandle.getFileHandle(`${oldName}.json`);
+    const file = await oldFileHandle.getFile();
+    const content = await file.text();
+
+    // Create new file
+    const newFileHandle = await dirHandle.getFileHandle(`${newName}.json`, { create: true });
+    const writable = await newFileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+
+    // Delete old file
+    await dirHandle.removeEntry(`${oldName}.json`);
+
+    // Update data structures and UI
+    timetableData[newName] = timetableData[oldName];
+    delete timetableData[oldName];
+    
+    // ...rest of existing renameClass code...
+    
+  } catch (error) {
+    console.error('Error renaming class:', error);
+    showNotification('Error renaming class!');
+  }
+}
 
 function updateEditMenu(container, className) {
   // Remove old menu if it exists
