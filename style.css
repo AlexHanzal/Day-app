@@ -1,15 +1,36 @@
 :root {
+  /* Dark theme (default) */
   --primary-color: #d9d9d9;
   --secondary-color: #474747;
-  --font-family: Arial, Helvetica, sans-serif;
-  --sidebar-width: 12%; /* Reduced from 15% */
   --third-color: #414141;
   --fifth-color: #ffffff;
+  --header-bg: #3d3d3d;
+  --sidebar-bg: #333333;
+  --font-family: Arial, Helvetica, sans-serif;
+  --sidebar-width: 12%; /* Reduced from 15% */
   --header-height: 10%;
+  --highlight-color: #555;
+  --highlight-cell-color: #666;
+  --bakalar-color-basic: #00AEEF;
+  --bakalar-color-hover: #008CC3;
 }
+
+:root[data-theme="light"] {
+  /* Light theme */
+  --primary-color: #474747;
+  --secondary-color: #d9d9d9;
+  --third-color: #f0f0f0;
+  --fifth-color: #000000;
+  --header-bg: #c2c2c2;
+  --sidebar-bg: #cccccc;
+  --highlight-color: #a8a8a8;
+  --highlight-cell-color: #b3b3b3;
+}
+
 /*{
   border: red solid 1px;
 }*/
+
 * {
   font-family: var(--font-family);
 }
@@ -24,7 +45,7 @@ html, body {
 .sidebar {
   width: var(--sidebar-width);
   height: 90%; /* Adjust height to fit below the header */
-  background-color: #333333; /* Darker color instead of var(--secondary-color) */
+  background-color: #cdd6d9; /* Use sidebar background color variable */
   padding: 15px; /* Reduced from 20px */
   position: fixed;
   top: 10%; /* Start below the header */
@@ -46,23 +67,25 @@ html, body {
   text-align: center;
 }
 
-body{
-  background-color: var(--third-color);
+body {
+  background-color: #fefefe;
   margin: 0;
   padding: 0;
 }
-.title{
-  color: var(--primary-color);
+
+.title {
+  color: #455459;
   font-size: 2em;
   text-align: center;
   padding: auto;
   font-weight: bold;
   text-shadow: 2px 2px 4px #000000;
 }
-header{
-  background-color: #3d3d3d;
+
+header {
+  background-color: #afb1b4; /* Use header background color variable */
   text-align: center;
-  color: var(--primary-color);
+  color: #455459;
   font-size: 1.5em;
   font-weight: bold;
   height: 10%;
@@ -76,15 +99,16 @@ header{
   width: 100%; /* Ensure it spans the full width */
   z-index: 1000; /* Ensure it stays above the sidebars */
 }
-.clock{
-  font-size:  clamp(16px, 2vw, 32px); 
-  color: var(--primary-color);;
+
+.clock {
+  font-size: clamp(16px, 2vw, 32px);
   color: var(--primary-color);
   font-weight: bold;
   text-align: center;
   width: 100%;
   margin: 10px 0;
 }
+
 .clock-separator {
   width: 90%; /* Adjust the width as needed */
   margin: 10px auto; /* Center the separator and add vertical spacing */
@@ -92,87 +116,11 @@ header{
   height: 2px; /* Set the height of the separator */
   background-color: var(--primary-color); /* Use the primary color for the separator */
 }
+
 ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-}
-.current-date{
-  font-size: clamp(14.8px, 1.6vw, 29.6px); /* Reduced by 20% */
-  color: var(--fifth-color);
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
-  background-color: #232323c9;
-  border-radius: 8px; /* Make the border round */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow effect */
-}
-.dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
-  color: var(--primary-color);
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
-}
-.calendar-title{
-  text-align: center;
-}
-
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px; /* Add spacing between the buttons and the title */
-}
-
-.calendar-header .calendar-title {
-  font-weight: bold;
-  font-size: 1.5em;
-  text-align: center;
-}
-
-.prev-button,
-.next-button {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  border: none;
-  padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold; /* Make the text bolder */
-}
-
-.prev-button:hover,
-.next-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-}
-
-.calendar-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px; /* Add spacing above the buttons */
-}
-
-.calendar-buttons .prev-button,
-.calendar-buttons .next-button {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  border: none;
-  padding: 5px 10px;
-  font-size: 1.2em; /* Increase font size for boldness */
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold; /* Make the text bolder */
-}
-
-.calendar-buttons .prev-button:hover,
-.calendar-buttons .next-button:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
 }
 
 td {
@@ -183,14 +131,6 @@ td {
   height: 40px; /* Set a consistent height for cells */
   vertical-align: middle; /* Center align text vertically */
   border: 1px solid var(--secondary-color); /* Optional: Add a border for clarity */
-}
-.month-dates{
-  font-size: clamp(12.8px, 1.6vw, 25.6px); /* Reduced by 20% */
-  color: #9d9d9d9f;
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-  margin: 10px 0;
 }
 
 table {
@@ -223,14 +163,14 @@ th {
   margin: 20px auto 0; /* Add more top margin */
   border-radius: 50%; /* Make it circular */
   background-color: transparent; /* Remove background */
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color); /* Add border for the circle */
+  color: var(--secondary-color);
+  border: 2px solid var(--secondary-color); /* Add border for the circle */
   cursor: pointer;
   font-weight: bold; /* Make text bold */
 }
 
 #create-new:hover {
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--secondary-color);
 }
 
@@ -252,7 +192,7 @@ th {
 }
 
 .select-window {
-  background-color: var(--secondary-color);
+  background-color: #555;
   color: var(--primary-color);
   padding: 20px;
   border-radius: 10px;
@@ -275,7 +215,7 @@ th {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: var(--secondary-color);
+  background-color: var(--bakalar-color-basic);
   color: var(--primary-color);
   border: none;
   padding: 5px 10px;
@@ -287,7 +227,7 @@ th {
 }
 
 .close-select:hover {
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--secondary-color);
   border-color: var(--secondary-color); /* Change border color on hover */
 }
@@ -324,7 +264,7 @@ th {
 .submit-button {
   margin-top: 15px;
   padding: 10px 20px;
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-basic);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
@@ -333,7 +273,7 @@ th {
 }
 
 .submit-button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--primary-color);
 }
 
@@ -368,7 +308,7 @@ button:hover {
   display: block;
   padding: 12px 24px; /* Reduced from 15px 30px */
   font-size: 1.2em; /* Increase font size */
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-basic);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
@@ -383,13 +323,13 @@ button:hover {
 }
 
 .dynamic-button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--primary-color);
 }
 
 .time-table {
   display: none; /* Initially hidden */
-  background-color: var(--secondary-color);
+  background-color: #FEFEFE;
   color: var(--primary-color);
   padding: 18px; /* Reduced from 20px */
   border-radius: 10px;
@@ -477,8 +417,15 @@ button:hover {
 }
 
 .week-table td.current-day {
-  background-color: #555;
+  background-color: var(--highlight-color);
   font-weight: bold;
+  border: 2px solid var(--primary-color);
+}
+
+/* Add highlighting for all cells in current day row */
+.week-table tr:has(td.current-day) td:not(:first-child) {
+  background-color: var(--highlight-cell-color);
+  border: 1px solid var(--primary-color);
 }
 
 .permanent-hour {
@@ -498,7 +445,7 @@ button:hover {
 .operator-button {
   padding: 10px 20px; /* Reduced from 10px 20px */
   font-size: 1em; /* Make button text 10% smaller */
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-basic);
   color: var (--secondary-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
@@ -509,15 +456,15 @@ button:hover {
 
 .edit-button:hover,
 .operator-button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--primary-color);
 }
 
 .save-button {
   padding: 10px 20px; /* Reduced from 10px 20px */
   font-size: 1em; /* Make button text 10% smaller */
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
+  background-color: var(--bakalar-color-hover);
+  color: black;
   border: 2px solid var(--primary-color);
   border-radius: 5px;
   cursor: pointer;
@@ -530,10 +477,25 @@ button:hover {
   color: var(--primary-color);
 }
 
-/* Remove the copy-all-button styles */
-.copy-all-button,
-.copy-all-button:hover {
-  display: none;
+.operator-button {
+  position: static;
+  padding: 12px 24px;  /* Increased padding */
+  background-color: var(--bakalar-color-basic);
+  color: var(--third-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;  /* Increased font size */
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 180px;  /* Increased max-width */
+}
+
+.operator-button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .verification-window {
@@ -581,7 +543,7 @@ button:hover {
 .verification-buttons button {
   padding: 10px 20px;
   font-size: 1em;
-  background-color: var(--primary-color);
+  background-color: var(--bakalar-color-basic);
   color: var(--secondary-color);
   border: 2px solid var(--primary-color);
   border-radius: 5px;
@@ -590,11 +552,10 @@ button:hover {
 }
 
 .verification-buttons button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--bakalar-color-hover);
   color: var(--primary-color);
 }
 
-/* Notification styles */
 .notification {
   position: fixed;
   top: 20px;
@@ -627,35 +588,9 @@ button:hover {
   width: calc(100% - 288px); /* Account for calendar width (270px) + gap (18px) */
 }
 
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: auto; /* Push calendar to the right */
-  align-self: flex-start;
-  position: sticky;
-  top: var(--header-height); /* Stick to top below header */
-}
-
 .week-table {
   width: 100%;
   margin-bottom: 20px;
-}
-
-.timetable-calendar {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 13px; /* Reduced from 15px */
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.timetable-calendar .calendar {
-  margin-top: 15px;
 }
 
 .week-table {
@@ -685,13 +620,6 @@ button:hover {
   justify-content: flex-start;
 }
 
-.timetable-calendar {
-  padding: 13px; /* Reduced from 15px */
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .timetable-content {
   display: flex;
   flex-direction: column;
@@ -711,15 +639,6 @@ button:hover {
 .time-table-buttons {
   display: flex;
   gap: 13px;
-}
-
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: auto;
 }
 
 .timetable-content {
@@ -747,32 +666,12 @@ button:hover {
   padding-left: 2.5%; /* Match the table's margin */
 }
 
-.timetable-calendar {
-  flex: 0 0 270px;
-  padding: 13px;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  align-self: flex-start;
-  position: sticky;
-  top: 0;
-}
-
 .date-cell {
   font-size: 0.9em;
   color: var(--primary-color);
   font-weight: normal;
   text-align: center;
   background-color: var(--secondary-color);
-}
-
-.dates:hover,
-.month-dates:hover,
-.current-date:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .window-controls {
@@ -796,6 +695,451 @@ button:hover {
 }
 
 .window-controls button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--secondary-color);
+}
+
+.class-button-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 200px; /* Increased to accommodate both buttons */
+  margin: 10px auto;
+}
+
+.dynamic-button {
+  display: block;
+  padding: 12px 24px; /* Reduced from 15px 30px */
+  font-size: 1.2em; /* Increase font size */
+  background-color: var(--bakalar-color-basic);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  max-width: 160px; /* Reduced from 200px */
+  width: 100%; /* Allow the button to shrink if needed */
+  box-sizing: border-box; /* Include padding and border in the width */
+  word-wrap: break-word; /* Ensure text wraps to a new row */
+  white-space: normal; /* Allow text to break into multiple lines */
+  margin: 0; /* Remove margin since container handles spacing */
+}
+
+.dynamic-button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--primary-color);
+}
+
+.edit-class-button {
+  position: static;
+  background-color: var(--bakalar-color-basic);
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 12px 15px;  /* Match dynamic-button padding */
+  font-size: 1em;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: calc(100% - 4px); /* Account for borders */
+  align-self: stretch; /* Make button stretch to container height */
+  margin: auto 0; /* Center vertically */
+  visibility: hidden; /* Change from display:none to visibility:hidden */
+}
+
+.edit-class-button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--secondary-color);
+}
+
+.edit-menu {
+  display: none;
+  position: absolute;
+  right: -120px;
+  top: 0;
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.edit-menu.active {
+  display: block;
+}
+
+.edit-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: var(--bakalar-color-basic);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.edit-menu button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--secondary-color);
+}
+
+.confirmation-dialog {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirmation-content {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirmation-buttons button {
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid var(--primary-color);
+  background-color: var(--bakalar-color-basic);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.confirmation-buttons button:hover {
+  background-color: var(--bakalar-color-hover);
+  color: var(--secondary-color);
+}
+
+.class-name-edit {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-content {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.edit-content input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  background-color: var(--third-color);
+  color: var(--primary-color);
+  box-sizing: border-box;
+}
+
+.customization-button {
+  position: static;
+  padding: 12px 24px;
+  background-color: var(--primary-color);
+  color: var(--third-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 180px;
+  margin-bottom: 10px;
+}
+
+.customization-button:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.customization-menu {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 3000;
+  min-width: 300px;
+}
+
+.customization-menu h2 {
+  margin-top: 20px; /* Add more space at top for close button */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.customization-menu.active {
+  display: block;
+}
+
+.customization-menu button {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+customization-menu button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.customization-menu .close-select {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: auto;
+}
+
+.customization-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2999;
+}
+
+.customization-overlay.active {
+  display: block;
+}
+
+.customization-menu button#select-directory,
+.customization-menu button#select-language,
+.customization-menu button#select-appearance {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.admin-controls {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.clear-data-button {
+  padding: 10px 20px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  display: none;
+}
+
+.clear-data-button:hover {
+  background-color: #cc0000;
+}
+
+.clear-data-button {
+  padding: 10px 20px;
+  background-color: #ff4444;
+  color: white;
+  border: 2px solid #ff4444;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  transition: all 0.2s ease;
+}
+
+.clear-data-button:hover {
+  background-color: #cc0000;
+  border-color: #cc0000;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.customization-menu h2,
+.current-directory p {
+  color: var(--primary-color);
+}
+
+.language-window {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 3000;
+  min-width: 300px;
+}
+
+.language-content {
+  position: relative;
+}
+
+.language-content h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.language-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.language-buttons button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.language-buttons button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.language-content .close-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.language-content .close-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.appearance-window {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 3000;
+  min-width: 300px;
+}
+
+.appearance-content {
+  position: relative;
+}
+
+.appearance-content h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.appearance-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.appearance-buttons button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.appearance-buttons button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.appearance-content .close-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.appearance-content .close-button:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
 }
