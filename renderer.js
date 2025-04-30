@@ -252,32 +252,62 @@ document.getElementById('close-select').addEventListener('click', () => {
 
 // Add event listener to the submit button
 document.getElementById('submit-button').addEventListener('click', () => {
-  const name = document.getElementById('name-input').value;
-  const type = document.getElementById('type-select').value;
-  console.log(`Name: ${name}, Type: ${type}`);
-  const selectScreen = document.getElementById('select-screen');
-  selectScreen.style.display = 'none'; // Close the select screen after submission
-});
-
-// Add functionality to create a button dynamically when submitting the form in the select screen
-document.getElementById('submit-button').addEventListener('click', () => {
   const nameInput = document.getElementById('name-input').value.trim();
+  const type = document.getElementById('type-select').value;
+  
   if (nameInput) {
-    // Initialize data structure for new timetable
-    if (!timetableData[nameInput]) {
-      timetableData[nameInput] = {};
-    }
+    // Initialize data structure
+    timetableData[nameInput] = { type: type };
+    saveTimeTableToFile(nameInput);
 
     const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = createClassButton(nameInput);
+    const newButton = createClassButton(nameInput, type);
     dynamicLinksContainer.appendChild(newButton);
 
-    // Clear the input and hide the select screen
     document.getElementById('name-input').value = '';
     const selectScreen = document.getElementById('select-screen');
     selectScreen.style.display = 'none';
   }
 });
+
+function createClassButton(timetableName, type) {
+  const container = document.createElement('div');
+  container.className = 'class-button-container';
+
+  const button = document.createElement('button');
+  button.textContent = timetableName;
+  button.className = 'dynamic-button';
+  
+  // Only show the edit button for 'class' type
+  if (type === 'class') {
+    const editButton = document.createElement('button');
+    editButton.innerHTML = '✎';
+    editButton.className = 'edit-class-button';
+    editButton.title = 'Edit class';
+    container.appendChild(editButton);
+    
+    const editMenu = updateEditMenu(container, timetableName);
+    editButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editMenu.classList.toggle('active');
+    });
+  }
+
+  container.appendChild(button);
+
+  // Add click handler for the main button
+  button.addEventListener('click', () => {
+    const timeTable = document.querySelector('.time-table');
+    const timeTableTitle = timeTable.querySelector('h2');
+    timeTableTitle.textContent = timetableName;
+    currentTimetableName = timetableName;
+    loadTimeTableFromFile(timetableName);
+    timeTable.style.display = 'block';
+    updateTimetableForWeek(selectedDate);
+  });
+
+  return container;
+}
 
 // Initialize only one calendar
 document.addEventListener('DOMContentLoaded', () => {
@@ -345,20 +375,6 @@ document.getElementById('create-new').addEventListener('click', () => {
 
 document.getElementById('close-select').addEventListener('click', () => {
   document.getElementById('select-screen').classList.remove('active');
-});
-
-document.getElementById('submit-button').addEventListener('click', () => {
-  const nameInput = document.getElementById('name-input').value.trim();
-  if (nameInput) {
-    const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = createClassButton(nameInput);
-    dynamicLinksContainer.appendChild(newButton);
-
-    // Clear the input and hide the select screen
-    document.getElementById('name-input').value = '';
-    const selectScreen = document.getElementById('select-screen');
-    selectScreen.style.display = 'none';
-  }
 });
 
 // Replace operator/admin button event listener
@@ -779,36 +795,33 @@ function saveTimeTableToFile(timetableName) {
 
 function loadTimeTableFromFile(timetableName) {
   try {
-    const data = JSON.parse(localStorage.getItem(timetableName));
-    if (data) {
-      timetableData[timetableName] = data;
-      return true;
+    // First try to load from localStorage
+    let data = JSON.parse(localStorage.getItem(timetableName));
+    
+    // If not in localStorage, try to load from classes directory
+    if (!data) {
+      const classData = JSON.parse(localStorage.getItem(`classes/${timetableName}.json`));
+      if (classData) {
+        data = classData;
+        // Save to localStorage for future use
+        localStorage.setItem(timetableName, JSON.stringify(data));
+      }
     }
-    return false;
+
+    // Initialize if no data found
+    if (!data) {
+      data = { permanentHours: {} };
+    }
+
+    timetableData[timetableName] = data;
+    updateTimetableForWeek(selectedDate);
+    return true;
   } catch (error) {
     console.error('Error loading timetable:', error);
     showNotification('Error loading timetable!');
     return false;
   }
 }
-
-// Replace the submit button event listener
-document.getElementById('submit-button').addEventListener('click', () => {
-  const nameInput = document.getElementById('name-input').value.trim();
-  if (nameInput) {
-    // Initialize data structure and create JSON file
-    timetableData[nameInput] = {};
-    saveTimeTableToFile(nameInput);
-
-    const dynamicLinksContainer = document.getElementById('dynamic-links-container');
-    const newButton = createClassButton(nameInput);
-    dynamicLinksContainer.appendChild(newButton);
-
-    document.getElementById('name-input').value = '';
-    const selectScreen = document.getElementById('select-screen');
-    selectScreen.style.display = 'none';
-  }
-});
 
 // Replace the handleSave function
 function handleSave() {
@@ -862,6 +875,36 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (error) {
     console.error('Error loading timetables:', error);
   }
+  
+  // Load all timetables from localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key.startsWith('settings') && !key.startsWith('preferred')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        timetableData[key] = data;
+        const button = createClassButton(key);
+        document.getElementById('dynamic-links-container').appendChild(button);
+      } catch (error) {
+        console.error('Error loading timetable:', error);
+      }
+    }
+  }
+
+  // Load classes from the classes directory
+  try {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('classes/') && key.endsWith('.json')) {
+        const timetableName = key.replace('classes/', '').replace('.json', '');
+        const button = createClassButton(timetableName);
+        document.getElementById('dynamic-links-container').appendChild(button);
+      }
+    });
+  } catch (error) {
+    console.error('Error loading classes:', error);
+  }
+  
+  // ...rest of existing DOMContentLoaded code...
 });
 
 function updateEditMenu(container, className) {
